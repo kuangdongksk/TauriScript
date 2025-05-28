@@ -1,9 +1,18 @@
-import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
-
-interface BreakOverlayProps {
-  breakTime: number; // 休息时间（分钟）
+declare global {
+  interface Window {
+    __TAURI__: {
+      event: {
+        listen<T>(
+          event: string,
+          handler: (event: { payload: T }) => void
+        ): Promise<() => void>;
+      };
+    };
+  }
 }
+
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 
 const BreakOverlay = () => {
   const [timeLeft, setTimeLeft] = useState(0); // 剩余休息时间（秒）
@@ -11,28 +20,34 @@ const BreakOverlay = () => {
 
   // 从Tauri事件获取休息时间
   useEffect(() => {
-    const unlisten = window.__TAURI__.event.listen<{ break_time: number }>(
-      "break-params",
-      (event) => {
-        const seconds = event.payload.break_time * 60;
-        setTimeLeft(seconds);
-        setInitialTime(seconds);
-      }
-    );
+    let unlisten: () => void;
+    let unlistenPostpone: () => void;
 
-    // 监听延长休息时间事件
-    const unlistenPostpone = window.__TAURI__.event.listen<number>(
-      "postpone-break",
-      (event) => {
-        const additionalSeconds = event.payload * 60;
-        setTimeLeft(prev => prev + additionalSeconds);
-        setInitialTime(prev => prev + additionalSeconds);
-      }
-    );
+    const setupListeners = async () => {
+      unlisten = await window.__TAURI__.event.listen<{ break_time: number }>(
+        "break-params",
+        (event) => {
+          const seconds = event.payload.break_time * 60;
+          setTimeLeft(seconds);
+          setInitialTime(seconds);
+        }
+      );
+
+      unlistenPostpone = await window.__TAURI__.event.listen<number>(
+        "postpone-break",
+        (event) => {
+          const additionalSeconds = event.payload * 60;
+          setTimeLeft((prev) => prev + additionalSeconds);
+          setInitialTime((prev) => prev + additionalSeconds);
+        }
+      );
+    };
+
+    setupListeners();
 
     return () => {
-      unlisten();
-      unlistenPostpone();
+      unlisten?.();
+      unlistenPostpone?.();
     };
   }, []);
 

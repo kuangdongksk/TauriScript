@@ -12,7 +12,7 @@ function App() {
       <Routes>
         {/* 休息提醒蒙层路由 */}
         <Route path="/break-overlay" element={<BreakOverlay />} />
-        
+
         {/* 主应用内容路由 */}
         <Route
           path="*"
