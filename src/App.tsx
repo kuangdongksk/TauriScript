@@ -1,58 +1,82 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
 
+// 组件导入
+import BreakOverlay from "./pages/BreakOverlay";
+import Pomodoro from "./pages/Pomodoro";
+
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-16 bg-gray-50 dark:bg-gray-900">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Welcome to Tauri + React</h1>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      {/* 主应用路由 */}
+      <Routes>
+        {/* 休息提醒蒙层路由 */}
+        <Route path="/break-overlay" element={<BreakOverlay />} />
+        
+        {/* 主应用内容路由 */}
+        <Route
+          path="*"
+          element={
+            <div className="flex h-screen">
+              {/* 侧边栏 */}
+              <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+                <nav className="p-4">
+                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                    工具箱
+                  </h2>
+                  <ul className="space-y-2">
+                    <li>
+                      <NavLink
+                        to="/pomodoro"
+                        className={({ isActive }) =>
+                          `flex items-center px-4 py-2 rounded-lg transition-colors ${
+                            isActive
+                              ? "bg-blue-500 text-white"
+                              : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`
+                        }
+                      >
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        番茄钟
+                      </NavLink>
+                    </li>
+                  </ul>
+                </nav>
+              </aside>
 
-      <div className="flex justify-center items-center gap-8 mb-8">
-        <a href="https://vitejs.dev" target="_blank" className="hover:scale-110 transition-transform">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank" className="hover:scale-110 transition-transform">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" className="hover:scale-110 transition-transform">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p className="text-gray-600 dark:text-gray-300 mb-8">
-        Click on the Tauri, Vite, and React logos to learn more.
-      </p>
-
-      <form
-        className="flex gap-4 mb-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              {/* 主内容区 */}
+              <main className="flex-1 overflow-auto">
+                <Routes>
+                  <Route path="/pomodoro" element={<Pomodoro />} />
+                  <Route
+                    path="/"
+                    element={
+                      <div className="flex items-center justify-center h-full">
+                        <h1 className="text-2xl text-gray-600 dark:text-gray-300">
+                          请从左侧选择工具
+                        </h1>
+                      </div>
+                    }
+                  />
+                </Routes>
+              </main>
+            </div>
+          }
         />
-        <button
-          type="submit"
-          className="px-4 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 active:bg-blue-700 transition-colors"
-        >
-          Greet
-        </button>
-      </form>
-      <p className="text-gray-600 dark:text-gray-300">{greetMsg}</p>
-    </main>
+      </Routes>
+    </div>
   );
 }
 
