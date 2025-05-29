@@ -1,22 +1,24 @@
 // Prevents additional console window on Windows in release
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{Manager, Window, WindowBuilder, WindowUrl};
+use tauri::Window;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
+use tauri::{Emitter, Manager, WebviewWindow};
 
 // 保存当前活动的休息窗口
-struct BreakState(Mutex<Option<Window>>);
+struct BreakState(Mutex<Option<WebviewWindow>>);
 
 #[derive(Serialize, Deserialize)]
+#[derive(Clone)]
 struct BreakParams {
-    break_time: u32,  // 休息时间（分钟）
+    break_time: u32, // 休息时间（分钟）
 }
 
 // 显示休息提醒蒙层
 #[tauri::command]
 async fn show_break_overlay(
-    window: Window,
+    window: WebviewWindow,
     app_handle: tauri::AppHandle,
     break_state: tauri::State<'_, BreakState>,
     params: BreakParams,
@@ -32,14 +34,14 @@ async fn show_break_overlay(
         .current_monitor()
         .map_err(|e| e.to_string())?
         .expect("无法获取当前显示器");
-    
+
     let monitor_size = monitor.size();
 
     // 创建新的休息提醒窗口
-    let break_window = WindowBuilder::new(
+    let break_window = tauri::WebviewWindowBuilder::new(
         &app_handle,
         "break_overlay",
-        WindowUrl::App("break-overlay".into())
+        tauri::WebviewUrl::App("break-overlay".into()),
     )
     .title("休息提醒")
     .fullscreen(true)
@@ -47,7 +49,7 @@ async fn show_break_overlay(
     .transparent(true) // 透明背景
     .always_on_top(true)
     .position(0.0, 0.0)
-    .size(monitor_size.width as f64, monitor_size.height as f64)
+    .inner_size(monitor_size.width as f64, monitor_size.height as f64)
     .build()
     .map_err(|e| e.to_string())?;
 
@@ -74,7 +76,7 @@ async fn end_break(
     }
 
     // 通知主窗口休息结束
-    if let Some(main_window) = app_handle.get_window("main") {
+    if let Some(main_window) = app_handle.get_webview_window("main") {
         main_window
             .emit("break-ended", ())
             .map_err(|e| e.to_string())?;
