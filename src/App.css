@@ -1,8 +1,4 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: all;
-}
-
 /* 自定义样式 */
 .logo {
   @apply h-24 p-6 transition-all duration-700;
