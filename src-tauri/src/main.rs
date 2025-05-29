@@ -40,7 +40,7 @@ async fn show_break_overlay(
     let break_window = tauri::WebviewWindowBuilder::new(
         &app_handle,
         "break_overlay",
-        tauri::WebviewUrl::App("break-overlay".into()),
+        tauri::WebviewUrl::App("localhost:1420/break-overlay".into()),
     )
     .title("休息提醒")
     .fullscreen(true)
