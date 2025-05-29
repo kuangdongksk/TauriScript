@@ -1,16 +1,3 @@
-declare global {
-  interface Window {
-    __TAURI__: {
-      event: {
-        listen<T>(
-          event: string,
-          handler: (event: { payload: T }) => void
-        ): Promise<() => void>;
-      };
-    };
-  }
-}
-
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
 
@@ -28,6 +15,10 @@ const BreakOverlay = () => {
         "break-params",
         (event) => {
           const seconds = event.payload.break_time * 60;
+          console.log("收到break-params事件:", {
+            break_time: event.payload.break_time,
+            seconds,
+          });
           setTimeLeft(seconds);
           setInitialTime(seconds);
         }
@@ -53,19 +44,29 @@ const BreakOverlay = () => {
 
   // 倒计时逻辑
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    console.log("倒计时状态变化:", { timeLeft, initialTime });
 
+    if (timeLeft <= 0) {
+      console.log("倒计时结束或未开始");
+      return;
+    }
+
+    console.log("开始新的倒计时间隔");
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        const next = prev <= 1 ? 0 : prev - 1;
+        console.log("倒计时更新:", { prev, next });
+        if (next === 0) {
           clearInterval(interval);
-          return 0;
         }
-        return prev - 1;
+        return next;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log("清理倒计时间隔");
+      clearInterval(interval);
+    };
   }, [timeLeft]);
 
   // 格式化时间显示
@@ -103,8 +104,8 @@ const BreakOverlay = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="max-w-md w-full bg-gray-800 bg-opacity-90 rounded-lg p-8 text-center">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="max-w-md w-full bg-gray-800/90 rounded-lg p-8 text-center">
         <h2 className="text-2xl font-bold text-white mb-2">休息时间</h2>
         <p className="text-gray-300 mb-6">请离开电脑，休息一下眼睛和身体</p>
 
