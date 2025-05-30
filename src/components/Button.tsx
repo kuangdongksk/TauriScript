@@ -6,6 +6,7 @@ function Button(props: IButtonProps) {
 
   return (
     <button
+      {...props}
       className={
         " text-white " +
         " px-6 py-2 " +
@@ -13,7 +14,6 @@ function Button(props: IButtonProps) {
         " focus:outline-none focus:ring-2 focus:ring-offset-2 " +
         (className || "")
       }
-      {...props}
     >
       {children}
     </button>

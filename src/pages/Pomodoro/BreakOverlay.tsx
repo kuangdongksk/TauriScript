@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -69,18 +70,18 @@ const BreakOverlay = () => {
         </div>
 
         <div className="flex space-x-4 justify-center">
-          <button
+          <Button
             onClick={postponeBreak}
-            className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className=" bg-gray-600 hover:bg-gray-500 focus:ring-gray-500 focus:ring-offset-gray-800"
           >
             稍后休息 (+5分钟)
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={结束休息2}
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className=" bg-green-600 hover:bg-green-500 focus:ring-green-500 focus:ring-offset-gray-800"
           >
             开始专注
-          </button>
+          </Button>
         </div>
       </div>
     </div>
