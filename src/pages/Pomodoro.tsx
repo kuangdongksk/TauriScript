@@ -11,7 +11,7 @@ interface PomodoroConfig {
 type TimerStatus = "idle" | "专注" | "休息";
 
 const Pomodoro = () => {
-  const { setBreakTime: setGlobalBreakTime } = useBreakStore();
+  const { 令休息时间为: setGlobalBreakTime } = useBreakStore();
   // 番茄钟配置
   const [config, setConfig] = useState<PomodoroConfig>({
     focusTime: 1,
@@ -86,7 +86,7 @@ const Pomodoro = () => {
   };
 
   // 监听休息结束状态
-  const { isBreakEnded, resetBreakEnded } = useBreakStore();
+  const { 休息是否结束: isBreakEnded, 开始休息: resetBreakEnded } = useBreakStore();
 
   useEffect(() => {
     if (isBreakEnded) {
@@ -148,7 +148,7 @@ const Pomodoro = () => {
   }, [isActive, timeLeft, status, currentCycle, config]);
 
   // 显示休息提醒蒙层
-  const { setBreakTime } = useBreakStore();
+  const { 令休息时间为: setBreakTime } = useBreakStore();
 
   const showBreakOverlay = async () => {
     // 设置全局状态中的休息时间

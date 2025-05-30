@@ -1,31 +1,34 @@
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import { useCallback, useEffect, useState } from "react";
 import { useBreakStore } from "../store/breakStore";
 
+dayjs.extend(duration);
+
 const BreakOverlay = () => {
-  const { breakTime, postponeBreak: postponeBreakStore } = useBreakStore();
+  const { 休息时间, 延长休息时间, 结束休息 } = useBreakStore();
 
-  const [timeLeft, setTimeLeft] = useState(0); // 剩余休息时间（秒）
-  const [initialTime, setInitialTime] = useState(0); // 初始休息时间（秒）
+  const [剩余休息时间, 令剩余休息时间为] = useState(0); // 剩余休息时间（秒）
 
-  // 从全局状态获取休息时间
+  const 结束休息2 = useCallback(async () => {
+    await invoke("end_break");
+    结束休息();
+  }, []);
+
   useEffect(() => {
-    if (breakTime > 0) {
-      const seconds = breakTime * 60;
+    const seconds = 休息时间 * 60;
+    令剩余休息时间为(seconds);
+  }, [休息时间]);
 
-      setTimeLeft(seconds);
-      setInitialTime(seconds);
-    }
-  }, [breakTime]);
-
-  // 倒计时逻辑
   useEffect(() => {
-    if (timeLeft <= 0) {
+    if (剩余休息时间 <= 0) {
+      结束休息2();
       return;
     }
 
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
+      令剩余休息时间为((prev) => {
         const next = prev <= 1 ? 0 : prev - 1;
         if (next === 0) {
           clearInterval(interval);
@@ -37,31 +40,12 @@ const BreakOverlay = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [timeLeft]);
+  }, [剩余休息时间]);
 
-  // 格式化时间显示
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
-  // 结束休息，关闭蒙层
-  const { endBreak: endBreakStore } = useBreakStore();
-  const endBreak = async () => {
-    await invoke("end_break");
-    endBreakStore(); // 更新全局状态
-  };
-
-  // 稍后休息（延长休息时间）
   const postponeBreak = async () => {
     await invoke("postpone_break", { minutes: 5 });
-    postponeBreakStore(5); // 更新全局状态
-    // 本地UI立即更新
-    setTimeLeft((prev) => prev + 5 * 60);
-    setInitialTime((prev) => prev + 5 * 60);
+    延长休息时间(5);
+    令剩余休息时间为((prev) => prev + 5 * 60);
   };
 
   return (
@@ -75,16 +59,14 @@ const BreakOverlay = () => {
             className="absolute left-0 top-0 h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear"
             style={{
               width: `${
-                initialTime > 0
-                  ? ((initialTime - timeLeft) / initialTime) * 100
-                  : 0
+                休息时间 > 0 ? ((休息时间 - 剩余休息时间) / 休息时间) * 100 : 0
               }%`,
             }}
           ></div>
         </div>
 
         <div className="text-5xl font-bold text-white mb-8">
-          {formatTime(timeLeft)}
+          {dayjs.duration(剩余休息时间, "seconds").format("mm:ss")}
         </div>
 
         <div className="flex space-x-4 justify-center">
@@ -95,7 +77,7 @@ const BreakOverlay = () => {
             稍后休息 (+5分钟)
           </button>
           <button
-            onClick={endBreak}
+            onClick={结束休息2}
             className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
             开始专注
