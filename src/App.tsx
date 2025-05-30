@@ -3,7 +3,7 @@ import "./App.css";
 
 // 组件导入
 import BreakOverlay from "./pages/Pomodoro/BreakOverlay";
-import Pomodoro from "./pages/Pomodoro";
+import Pomodoro from "./pages/Pomodoro/Pomodoro";
 
 function App() {
   return (
