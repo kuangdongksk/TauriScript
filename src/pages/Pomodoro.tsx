@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useBreakStore } from "../store/breakStore";
 
@@ -8,7 +9,7 @@ interface PomodoroConfig {
   cycles: number; // 循环次数
 }
 
-type TimerStatus = "idle" | "专注" | "休息";
+type TimerStatus = "准备就绪" | "专注中" | "休息中";
 
 const Pomodoro = () => {
   const { 令休息时间为: setGlobalBreakTime } = useBreakStore();
@@ -20,7 +21,7 @@ const Pomodoro = () => {
   });
 
   // 计时器状态
-  const [status, setStatus] = useState<TimerStatus>("idle");
+  const [status, setStatus] = useState<TimerStatus>("准备就绪");
   const [timeLeft, setTimeLeft] = useState(0); // 剩余时间（秒）
   const [isActive, setIsActive] = useState(false); // 计时器是否激活
   const [currentCycle, setCurrentCycle] = useState(1); // 当前循环次数
@@ -64,8 +65,8 @@ const Pomodoro = () => {
 
   // 开始番茄钟
   const startTimer = () => {
-    if (status === "idle") {
-      setStatus("专注");
+    if (status === "准备就绪") {
+      setStatus("专注中");
       setTimeLeft(config.focusTime * 60);
       setCurrentCycle(1);
     }
@@ -80,13 +81,14 @@ const Pomodoro = () => {
   // 重置番茄钟
   const resetTimer = () => {
     setIsActive(false);
-    setStatus("idle");
+    setStatus("准备就绪");
     setTimeLeft(0);
     setCurrentCycle(1);
   };
 
   // 监听休息结束状态
-  const { 休息是否结束: isBreakEnded, 开始休息: resetBreakEnded } = useBreakStore();
+  const { 休息是否结束: isBreakEnded, 开始休息: resetBreakEnded } =
+    useBreakStore();
 
   useEffect(() => {
     if (isBreakEnded) {
@@ -94,7 +96,7 @@ const Pomodoro = () => {
       if (currentCycle < config.cycles) {
         // 还有循环，继续专注
         setCurrentCycle((prev) => prev + 1);
-        setStatus("专注");
+        setStatus("专注中");
         setTimeLeft(config.focusTime * 60);
         setIsActive(true);
       } else {
@@ -122,18 +124,17 @@ const Pomodoro = () => {
       }, 1000);
     } else if (isActive && timeLeft === 0) {
       // 时间结束，切换状态
-      if (status === "专注") {
+      if (status === "专注中") {
         // 专注时间结束，显示休息提醒
         showBreakOverlay();
-        setStatus("休息");
+        setStatus("休息中");
         setTimeLeft(config.breakTime * 60);
-        setIsActive(false); // 暂停主计时器，等待用户从休息窗口返回
-      } else if (status === "休息") {
+      } else if (status === "休息中") {
         // 休息时间结束
         if (currentCycle < config.cycles) {
           // 还有循环，继续专注
           setCurrentCycle((prev) => prev + 1);
-          setStatus("专注");
+          setStatus("专注中");
           setTimeLeft(config.focusTime * 60);
         } else {
           // 所有循环完成
@@ -148,26 +149,16 @@ const Pomodoro = () => {
   }, [isActive, timeLeft, status, currentCycle, config]);
 
   // 显示休息提醒蒙层
-  const { 令休息时间为: setBreakTime } = useBreakStore();
+  const { 令休息时间为 } = useBreakStore();
 
   const showBreakOverlay = async () => {
-    // 设置全局状态中的休息时间
-    setBreakTime(config.breakTime);
+    令休息时间为(config.breakTime);
 
     await invoke("show_break_overlay", {
       params: {
         break_time: config.breakTime,
       },
     });
-  };
-
-  // 格式化时间显示
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
   };
 
   return (
@@ -288,25 +279,23 @@ const Pomodoro = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center">
           <div
             className={`w-64 h-64 rounded-full border-8 ${
-              status === "专注"
+              status === "专注中"
                 ? "border-red-500"
-                : status === "休息"
+                : status === "休息中"
                 ? "border-green-500"
                 : "border-gray-300 dark:border-gray-600"
             } flex items-center justify-center mb-6`}
           >
             <div className="text-center">
               <div className="text-4xl font-bold text-gray-800 dark:text-white">
-                {status === "idle" ? "--:--" : formatTime(timeLeft)}
+                {status === "准备就绪"
+                  ? "--:--"
+                  : dayjs.duration(timeLeft, "seconds").format("mm:ss")}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                {status === "专注"
-                  ? "专注中"
-                  : status === "休息"
-                  ? "休息中"
-                  : "准备就绪"}
+                {status}
               </div>
-              {status !== "idle" && (
+              {status !== "准备就绪" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   循环 {currentCycle}/{config.cycles}
                 </div>
@@ -320,7 +309,7 @@ const Pomodoro = () => {
                 onClick={startTimer}
                 className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                {status === "idle" ? "开始" : "继续"}
+                {status === "准备就绪" ? "开始" : "继续"}
               </button>
             ) : (
               <button

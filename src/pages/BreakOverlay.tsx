@@ -9,7 +9,7 @@ dayjs.extend(duration);
 const BreakOverlay = () => {
   const { 休息时间, 延长休息时间, 结束休息 } = useBreakStore();
 
-  const [剩余休息时间, 令剩余休息时间为] = useState(0); // 剩余休息时间（秒）
+  const [剩余休息时间, 令剩余休息时间为] = useState(休息时间 * 60); // 剩余休息时间（秒）
 
   const 结束休息2 = useCallback(async () => {
     await invoke("end_break");
@@ -17,8 +17,7 @@ const BreakOverlay = () => {
   }, []);
 
   useEffect(() => {
-    const seconds = 休息时间 * 60;
-    令剩余休息时间为(seconds);
+    令剩余休息时间为(休息时间 * 60);
   }, [休息时间]);
 
   useEffect(() => {
