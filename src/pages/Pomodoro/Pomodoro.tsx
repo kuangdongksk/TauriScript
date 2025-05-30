@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useBreakStore } from "../../store/breakStore";
 import ConfigForm, { PomodoroConfig } from "./components/ConfigForm";
+import Button from "@/components/Button";
 
 type TimerStatus = "准备就绪" | "专注中" | "休息中";
 
@@ -163,26 +164,26 @@ const Pomodoro = () => {
 
           <div className="flex space-x-4">
             {!isActive ? (
-              <button
+              <Button
                 onClick={startTimer}
-                className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="bg-blue-500  hover:bg-blue-600 focus:ring-blue-500 "
               >
                 {status === "准备就绪" ? "开始" : "继续"}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={pauseTimer}
-                className="px-6 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                className="bg-yellow-500  hover:bg-yellow-600 focus:ring-yellow-500 "
               >
                 暂停
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={resetTimer}
-              className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="bg-gray-500  hover:bg-gray-600 focus:ring-gray-500 "
             >
               重置
-            </button>
+            </Button>
           </div>
         </div>
       </div>
