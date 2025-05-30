@@ -1,61 +1,32 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useState } from "react";
+import { useBreakStore } from "../store/breakStore";
 
 const BreakOverlay = () => {
+  const { breakTime, postponeBreak: postponeBreakStore } = useBreakStore();
+
   const [timeLeft, setTimeLeft] = useState(0); // 剩余休息时间（秒）
   const [initialTime, setInitialTime] = useState(0); // 初始休息时间（秒）
 
-  // 从Tauri事件获取休息时间
+  // 从全局状态获取休息时间
   useEffect(() => {
-    let unlisten: () => void;
-    let unlistenPostpone: () => void;
+    if (breakTime > 0) {
+      const seconds = breakTime * 60;
 
-    const setupListeners = async () => {
-      unlisten = await window.__TAURI__.event.listen<{ break_time: number }>(
-        "break-params",
-        (event) => {
-          const seconds = event.payload.break_time * 60;
-          console.log("收到break-params事件:", {
-            break_time: event.payload.break_time,
-            seconds,
-          });
-          setTimeLeft(seconds);
-          setInitialTime(seconds);
-        }
-      );
-
-      unlistenPostpone = await window.__TAURI__.event.listen<number>(
-        "postpone-break",
-        (event) => {
-          const additionalSeconds = event.payload * 60;
-          setTimeLeft((prev) => prev + additionalSeconds);
-          setInitialTime((prev) => prev + additionalSeconds);
-        }
-      );
-    };
-
-    setupListeners();
-
-    return () => {
-      unlisten?.();
-      unlistenPostpone?.();
-    };
-  }, []);
+      setTimeLeft(seconds);
+      setInitialTime(seconds);
+    }
+  }, [breakTime]);
 
   // 倒计时逻辑
   useEffect(() => {
-    console.log("倒计时状态变化:", { timeLeft, initialTime });
-
     if (timeLeft <= 0) {
-      console.log("倒计时结束或未开始");
       return;
     }
 
-    console.log("开始新的倒计时间隔");
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         const next = prev <= 1 ? 0 : prev - 1;
-        console.log("倒计时更新:", { prev, next });
         if (next === 0) {
           clearInterval(interval);
         }
@@ -64,7 +35,6 @@ const BreakOverlay = () => {
     }, 1000);
 
     return () => {
-      console.log("清理倒计时间隔");
       clearInterval(interval);
     };
   }, [timeLeft]);
@@ -78,41 +48,38 @@ const BreakOverlay = () => {
       .padStart(2, "0")}`;
   };
 
-  // 计算进度百分比
-  const progressPercentage =
-    initialTime > 0 ? ((initialTime - timeLeft) / initialTime) * 100 : 0;
-
   // 结束休息，关闭蒙层
+  const { endBreak: endBreakStore } = useBreakStore();
   const endBreak = async () => {
-    try {
-      await invoke("end_break");
-    } catch (error) {
-      console.error("结束休息失败", error);
-    }
+    await invoke("end_break");
+    endBreakStore(); // 更新全局状态
   };
 
   // 稍后休息（延长休息时间）
   const postponeBreak = async () => {
-    try {
-      await invoke("postpone_break", { minutes: 5 });
-      // 本地UI立即更新，不等待后端事件
-      setTimeLeft((prev) => prev + 5 * 60);
-      setInitialTime((prev) => prev + 5 * 60);
-    } catch (error) {
-      console.error("延长休息失败", error);
-    }
+    await invoke("postpone_break", { minutes: 5 });
+    postponeBreakStore(5); // 更新全局状态
+    // 本地UI立即更新
+    setTimeLeft((prev) => prev + 5 * 60);
+    setInitialTime((prev) => prev + 5 * 60);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="max-w-md w-full bg-gray-800/90 rounded-lg p-8 text-center">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div className="max-w-md w-full rounded-lg p-8 text-center">
         <h2 className="text-2xl font-bold text-white mb-2">休息时间</h2>
         <p className="text-gray-300 mb-6">请离开电脑，休息一下眼睛和身体</p>
 
-        <div className="relative h-4 bg-gray-700 rounded-full mb-8">
+        <div className="relative h-4 rounded-full mb-8">
           <div
             className="absolute left-0 top-0 h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear"
-            style={{ width: `${progressPercentage}%` }}
+            style={{
+              width: `${
+                initialTime > 0
+                  ? ((initialTime - timeLeft) / initialTime) * 100
+                  : 0
+              }%`,
+            }}
           ></div>
         </div>
 

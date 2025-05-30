@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import { useEffect, useState } from "react";
+import { useBreakStore } from "../store/breakStore";
 
 interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
@@ -8,13 +8,14 @@ interface PomodoroConfig {
   cycles: number; // 循环次数
 }
 
-type TimerStatus = "idle" | "focus" | "break";
+type TimerStatus = "idle" | "专注" | "休息";
 
 const Pomodoro = () => {
+  const { setBreakTime: setGlobalBreakTime } = useBreakStore();
   // 番茄钟配置
   const [config, setConfig] = useState<PomodoroConfig>({
-    focusTime: 25,
-    breakTime: 5,
+    focusTime: 1,
+    breakTime: 1,
     cycles: 4,
   });
 
@@ -37,6 +38,7 @@ const Pomodoro = () => {
   ) => {
     const value = parseInt(e.target.value) || 0;
     setConfig({ ...config, [field]: value });
+    setGlobalBreakTime(config.breakTime);
   };
 
   // 保存当前配置
@@ -47,8 +49,8 @@ const Pomodoro = () => {
     setSavedConfigs([...savedConfigs, newConfig]);
     setConfigName("");
 
-    // 在实际应用中，这里可以调用Tauri API保存到本地存储
-    // 例如: invoke("save_pomodoro_config", { config: newConfig });
+    // TODO 调用 Tauri 命令保存配置
+    // invoke("save_pomodoro_config", { config: newConfig });
   };
 
   // 加载保存的配置
@@ -63,7 +65,7 @@ const Pomodoro = () => {
   // 开始番茄钟
   const startTimer = () => {
     if (status === "idle") {
-      setStatus("focus");
+      setStatus("专注");
       setTimeLeft(config.focusTime * 60);
       setCurrentCycle(1);
     }
@@ -83,32 +85,32 @@ const Pomodoro = () => {
     setCurrentCycle(1);
   };
 
-  // 监听休息结束事件
+  // 监听休息结束状态
+  const { isBreakEnded, resetBreakEnded } = useBreakStore();
+
   useEffect(() => {
-    const setupBreakEndedListener = async () => {
-      const unlisten = await listen("break-ended", () => {
-        // 休息结束，开始新的专注时间
-        if (currentCycle < config.cycles) {
-          // 还有循环，继续专注
-          setCurrentCycle((prev) => prev + 1);
-          setStatus("focus");
-          setTimeLeft(config.focusTime * 60);
-          setIsActive(true);
-        } else {
-          // 所有循环完成
-          resetTimer();
-        }
-      });
-
-      return unlisten;
-    };
-
-    const unlistenPromise = setupBreakEndedListener();
-
-    return () => {
-      unlistenPromise.then(unlisten => unlisten());
-    };
-  }, [config.cycles, config.focusTime, currentCycle]);
+    if (isBreakEnded) {
+      // 休息结束，开始新的专注时间
+      if (currentCycle < config.cycles) {
+        // 还有循环，继续专注
+        setCurrentCycle((prev) => prev + 1);
+        setStatus("专注");
+        setTimeLeft(config.focusTime * 60);
+        setIsActive(true);
+      } else {
+        // 所有循环完成
+        resetTimer();
+      }
+      // 重置休息结束状态
+      resetBreakEnded();
+    }
+  }, [
+    isBreakEnded,
+    config.cycles,
+    config.focusTime,
+    currentCycle,
+    resetBreakEnded,
+  ]);
 
   // 处理计时器逻辑
   useEffect(() => {
@@ -120,18 +122,18 @@ const Pomodoro = () => {
       }, 1000);
     } else if (isActive && timeLeft === 0) {
       // 时间结束，切换状态
-      if (status === "focus") {
+      if (status === "专注") {
         // 专注时间结束，显示休息提醒
         showBreakOverlay();
-        setStatus("break");
+        setStatus("休息");
         setTimeLeft(config.breakTime * 60);
         setIsActive(false); // 暂停主计时器，等待用户从休息窗口返回
-      } else if (status === "break") {
+      } else if (status === "休息") {
         // 休息时间结束
         if (currentCycle < config.cycles) {
           // 还有循环，继续专注
           setCurrentCycle((prev) => prev + 1);
-          setStatus("focus");
+          setStatus("专注");
           setTimeLeft(config.focusTime * 60);
         } else {
           // 所有循环完成
@@ -146,16 +148,17 @@ const Pomodoro = () => {
   }, [isActive, timeLeft, status, currentCycle, config]);
 
   // 显示休息提醒蒙层
+  const { setBreakTime } = useBreakStore();
+
   const showBreakOverlay = async () => {
-    try {
-      await invoke("show_break_overlay", { 
-        params: { 
-          break_time: config.breakTime 
-        } 
-      });
-    } catch (error) {
-      console.error("显示休息提醒蒙层失败", error);
-    }
+    // 设置全局状态中的休息时间
+    setBreakTime(config.breakTime);
+
+    await invoke("show_break_overlay", {
+      params: {
+        break_time: config.breakTime,
+      },
+    });
   };
 
   // 格式化时间显示
@@ -264,7 +267,8 @@ const Pomodoro = () => {
                     className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded"
                   >
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {saved.name} ({saved.focusTime}分钟专注 / {saved.breakTime}
+                      {saved.name} ({saved.focusTime}分钟专注 /{" "}
+                      {saved.breakTime}
                       分钟休息 x {saved.cycles}循环)
                     </span>
                     <button
@@ -284,9 +288,9 @@ const Pomodoro = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center">
           <div
             className={`w-64 h-64 rounded-full border-8 ${
-              status === "focus"
+              status === "专注"
                 ? "border-red-500"
-                : status === "break"
+                : status === "休息"
                 ? "border-green-500"
                 : "border-gray-300 dark:border-gray-600"
             } flex items-center justify-center mb-6`}
@@ -296,9 +300,9 @@ const Pomodoro = () => {
                 {status === "idle" ? "--:--" : formatTime(timeLeft)}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                {status === "focus"
+                {status === "专注"
                   ? "专注中"
-                  : status === "break"
+                  : status === "休息"
                   ? "休息中"
                   : "准备就绪"}
               </div>

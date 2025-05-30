@@ -8,8 +8,7 @@ use tauri::{Emitter, Manager, WebviewWindow};
 // 保存当前活动的休息窗口
 struct BreakState(Mutex<Option<WebviewWindow>>);
 
-#[derive(Serialize, Deserialize)]
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct BreakParams {
     break_time: u32, // 休息时间（分钟）
 }
@@ -44,9 +43,9 @@ async fn show_break_overlay(
     )
     .title("休息提醒")
     .fullscreen(true)
-    .decorations(false) // 无边框
+    .decorations(true) // 无边框
     .transparent(true) // 透明背景
-    .always_on_top(true)
+    .always_on_top(false) // 不总在最上层
     .position(0.0, 0.0)
     .inner_size(monitor_size.width as f64, monitor_size.height as f64)
     .build()
