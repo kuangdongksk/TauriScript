@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useCallback, useEffect, useState } from "react";
-import { useBreakStore } from "../store/breakStore";
+import { useBreakStore } from "../../store/breakStore";
 
 dayjs.extend(duration);
 

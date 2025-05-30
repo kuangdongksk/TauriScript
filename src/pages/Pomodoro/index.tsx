@@ -1,7 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
+import { Button } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { useBreakStore } from "../store/breakStore";
+import { useBreakStore } from "../../store/breakStore";
 
 interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
@@ -235,12 +236,12 @@ const Pomodoro = () => {
                   placeholder="配置名称"
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
-                <button
+                <Button
                   onClick={saveConfig}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   保存
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -262,12 +263,12 @@ const Pomodoro = () => {
                       {saved.breakTime}
                       分钟休息 x {saved.cycles}循环)
                     </span>
-                    <button
+                    <Button
                       onClick={() => loadConfig(saved)}
                       className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
                     >
                       加载
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -305,26 +306,26 @@ const Pomodoro = () => {
 
           <div className="flex space-x-4">
             {!isActive ? (
-              <button
+              <Button
                 onClick={startTimer}
                 className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {status === "准备就绪" ? "开始" : "继续"}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={pauseTimer}
                 className="px-6 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
               >
                 暂停
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={resetTimer}
               className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               重置
-            </button>
+            </Button>
           </div>
         </div>
       </div>

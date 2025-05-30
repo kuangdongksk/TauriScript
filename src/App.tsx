@@ -2,7 +2,7 @@ import { NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
 
 // 组件导入
-import BreakOverlay from "./pages/BreakOverlay";
+import BreakOverlay from "./pages/Pomodoro/BreakOverlay";
 import Pomodoro from "./pages/Pomodoro";
 
 function App() {
