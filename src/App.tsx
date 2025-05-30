@@ -7,7 +7,7 @@ import Pomodoro from "./pages/Pomodoro/Pomodoro";
 
 function App() {
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen ">
       {/* 主应用路由 */}
       <Routes>
         {/* 休息提醒蒙层路由 */}
@@ -17,7 +17,7 @@ function App() {
         <Route
           path="*"
           element={
-            <div className="flex h-screen">
+            <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-900">
               {/* 侧边栏 */}
               <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
                 <nav className="p-4">
