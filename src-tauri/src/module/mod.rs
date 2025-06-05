@@ -1,2 +1,2 @@
 pub mod pomodoro;
-pub mod tray;
+// pub mod tray;
