@@ -1,40 +1,40 @@
-// use tauri::{AppHandle, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
+use tauri::tray::TrayIconBuilder;
+use tauri::{ Manager, tray::{ MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent } };
 
-// pub fn create_tray() -> SystemTray {
-//     // 创建系统托盘菜单
-//     let tray_menu = SystemTrayMenu::new()
-//         .add_item(SystemTrayMenuItem::new("show", "显示窗口"))
-//         .add_native_item(SystemTrayMenuItem::Separator)
-//         .add_item(SystemTrayMenuItem::new("quit", "退出"));
+tauri::Builder::default().setup(|app| {
+    let tray = TrayIconBuilder::new().build(app)?;
+    Ok(())
+});
 
-//     // 创建系统托盘
-//     SystemTray::new().with_menu(tray_menu)
-// }
+TrayIconBuilder::new().on_menu_event(|app, event| {
+    match event.id.as_ref() {
+        "quit" => {
+            println!("quit menu item was clicked");
+            app.exit(0);
+        }
+        _ => {
+            println!("menu item {:?} not handled", event.id);
+        }
+    }
+});
 
-// pub fn handle_tray_event(app: &AppHandle, event: SystemTrayEvent) {
-//     match event {
-//         // 左键点击
-//         SystemTrayEvent::LeftClick { .. } => {
-//             let window = app.get_window("main").unwrap();
-//             if window.is_visible().unwrap() {
-//                 window.hide().unwrap();
-//             } else {
-//                 window.show().unwrap();
-//                 window.set_focus().unwrap();
-//             }
-//         }
-//         // 菜单事件
-//         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-//             "show" => {
-//                 let window = app.get_window("main").unwrap();
-//                 window.show().unwrap();
-//                 window.set_focus().unwrap();
-//             }
-//             "quit" => {
-//                 app.exit(0);
-//             }
-//             _ => {}
-//         },
-//         _ => {}
-//     }
-// }
+TrayIconBuilder::new().on_tray_icon_event(|tray, event| {
+    match event {
+        TrayIconEvent::Click {
+            button: MouseButton::Left,
+            button_state: MouseButtonState::Up,
+            ..
+        } => {
+            println!("left click pressed and released");
+            // in this example, let's show and focus the main window when the tray is clicked
+            let app = tray.app_handle();
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }
+        _ => {
+            println!("unhandled event {event:?}");
+        }
+    }
+});
