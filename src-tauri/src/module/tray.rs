@@ -50,11 +50,26 @@ fn handle_menu_event(app: &tauri::AppHandle, event: MenuEvent) {
 
 fn handle_tray_icon_event(_tray: &TrayIcon, event: TrayIconEvent) {
     match event {
-        TrayIconEvent::Click { button, button_state, .. } => {
-            println!("托盘图标被点击: button={:?}, state={:?}", button, button_state);
+        TrayIconEvent::Click { button, button_state, position, .. } => {
+            println!(
+                "托盘图标被点击: 按钮={:?}, 状态={:?}, 位置={:?}",
+                button,
+                button_state,
+                position
+            );
         }
-        _ => {
-            println!("未处理的托盘事件 {event:?}");
+        TrayIconEvent::DoubleClick { button, position, .. } => {
+            println!("托盘图标被双击: 按钮={:?}, 位置={:?}", button, position);
         }
+        TrayIconEvent::Enter { position, .. } => {
+            println!("托盘图标被右键点击: 位置={:?}", position);
+        }
+        TrayIconEvent::Move { position, .. } => {
+            println!("鼠标移动到托盘图标: 位置={:?}", position);
+        }
+        TrayIconEvent::Leave { id, .. } => {
+            println!("鼠标离开托盘图标: 事件名={:?}", id);
+        }
+        _ => todo!(),
     }
 }
