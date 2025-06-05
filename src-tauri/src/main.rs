@@ -4,6 +4,7 @@
 mod module;
 use module::pomodoro::{end_break, postpone_break, show_break_overlay, BreakState};
 use module::tray::create_tray;
+use tauri_plugin_autostart::{MacosLauncher, init};
 
 fn main() {
     tauri::Builder::default()
@@ -12,7 +13,7 @@ fn main() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::new().build())
-        .plugin(tauri_plugin_autostart::init())
+        .plugin(init(MacosLauncher::LaunchAgent, None))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_fs::init())
         .manage(BreakState(std::sync::Mutex::new(None)))

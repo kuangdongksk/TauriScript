@@ -1,7 +1,6 @@
 {
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "主窗口的能力",
+  "identifier": "main-permissions",
+  "description": "主窗口的权限",
   "local": false,
   "windows": ["main"],
   "webview": ["main"],

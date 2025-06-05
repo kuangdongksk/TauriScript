@@ -1,18 +1,17 @@
 {
   "identifier": "desktop-capability",
-  "platforms": [
-    "macOS",
-    "windows",
-    "linux"
-  ],
-  "windows": [
-    "main"
-  ],
+  "platforms": ["macOS", "windows", "linux"],
+  "local": false,
+  "windows": ["main"],
+  "webview": ["main"],
+  "URL": ["http://localhost:1420"],
   "permissions": [
     "autostart:default",
-    "autostart:default",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled",
+
     "window-state:default",
-    "autostart:default",
     "sql:default",
     "store:default",
     "fs:default",

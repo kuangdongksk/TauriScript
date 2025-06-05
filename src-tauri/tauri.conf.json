@@ -13,6 +13,7 @@
     },
     "windows": [
       {
+        "label": "main",
         "title": "桌面工具集",
         "width": 1024,
         "height": 768,
