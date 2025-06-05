@@ -12,7 +12,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .manage(BreakState(std::sync::Mutex::new(None)))
         .setup(|app| {
-            create_tray(app)?;
+            create_tray(&app.handle())?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![show_break_overlay, end_break, postpone_break])

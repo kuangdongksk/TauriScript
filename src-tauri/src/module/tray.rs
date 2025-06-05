@@ -1,20 +1,22 @@
 use tauri::{
     Manager,
-    menu::{ Menu, MenuEvent, MenuItem, Submenu },
+    menu::{ Menu, MenuEvent, MenuItem },
     tray::{ TrayIcon, TrayIconBuilder, TrayIconEvent },
 };
 
 pub fn create_tray(app: &tauri::AppHandle) -> Result<TrayIcon, Box<dyn std::error::Error>> {
+    // 创建菜单项
+    let show_i = MenuItem::with_id(app, "show", "显示窗口", true, None::<&str>)?;
+    let hide_i = MenuItem::with_id(app, "hide", "隐藏窗口", true, None::<&str>)?;
+    let quit_i = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
+
     // 创建托盘菜单
-    let menu = Menu::new()
-        .add_item(MenuItem::new("show", "显示窗口"))
-        .add_item(MenuItem::new("hide", "隐藏窗口"))
-        .add_native_item(MenuItem::Separator)
-        .add_item(MenuItem::new("quit", "退出"));
+    let menu = Menu::with_items(app, &[&show_i, &hide_i, &quit_i])?;
 
     // 创建托盘图标
     let tray = TrayIconBuilder::new()
         .menu(&menu)
+        .show_menu_on_left_click(true) // 左键点击时显示菜单
         .on_menu_event(move |app, event| {
             handle_menu_event(app, event);
         })
@@ -27,7 +29,7 @@ pub fn create_tray(app: &tauri::AppHandle) -> Result<TrayIcon, Box<dyn std::erro
 }
 
 fn handle_menu_event(app: &tauri::AppHandle, event: MenuEvent) {
-    match event.id().as_str() {
+    match event.id().0.as_str() {
         "quit" => {
             app.exit(0);
         }
@@ -46,14 +48,13 @@ fn handle_menu_event(app: &tauri::AppHandle, event: MenuEvent) {
     }
 }
 
-fn handle_tray_icon_event(tray: &TrayIcon, event: TrayIconEvent) {
-    if let TrayIconEvent::Click { click_type, .. } = event {
-        if click_type == ClickType::Left {
-            let app = tray.app_handle();
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+fn handle_tray_icon_event(_tray: &TrayIcon, event: TrayIconEvent) {
+    match event {
+        TrayIconEvent::Click { button, button_state, .. } => {
+            println!("托盘图标被点击: button={:?}, state={:?}", button, button_state);
+        }
+        _ => {
+            println!("未处理的托盘事件 {event:?}");
         }
     }
 }
