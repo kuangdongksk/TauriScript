@@ -4,10 +4,11 @@
 mod module;
 use module::pomodoro::{end_break, postpone_break, show_break_overlay, BreakState};
 use module::tray::create_tray;
-use tauri_plugin_autostart::{MacosLauncher, init};
+use tauri_plugin_autostart::{init, MacosLauncher};
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, None))
         .plugin(tauri_plugin_upload::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
