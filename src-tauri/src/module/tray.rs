@@ -1,40 +1,59 @@
-use tauri::tray::TrayIconBuilder;
-use tauri::{ Manager, tray::{ MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent } };
+use tauri::{
+    Manager,
+    menu::{ Menu, MenuEvent, MenuItem, Submenu },
+    tray::{ TrayIcon, TrayIconBuilder, TrayIconEvent },
+};
 
-tauri::Builder::default().setup(|app| {
-    let tray = TrayIconBuilder::new().build(app)?;
-    Ok(())
-});
+pub fn create_tray(app: &tauri::AppHandle) -> Result<TrayIcon, Box<dyn std::error::Error>> {
+    // 创建托盘菜单
+    let menu = Menu::new()
+        .add_item(MenuItem::new("show", "显示窗口"))
+        .add_item(MenuItem::new("hide", "隐藏窗口"))
+        .add_native_item(MenuItem::Separator)
+        .add_item(MenuItem::new("quit", "退出"));
 
-TrayIconBuilder::new().on_menu_event(|app, event| {
-    match event.id.as_ref() {
+    // 创建托盘图标
+    let tray = TrayIconBuilder::new()
+        .menu(&menu)
+        .on_menu_event(move |app, event| {
+            handle_menu_event(app, event);
+        })
+        .on_tray_icon_event(move |tray, event| {
+            handle_tray_icon_event(tray, event);
+        })
+        .build(app)?;
+
+    Ok(tray)
+}
+
+fn handle_menu_event(app: &tauri::AppHandle, event: MenuEvent) {
+    match event.id().as_str() {
         "quit" => {
-            println!("quit menu item was clicked");
             app.exit(0);
         }
-        _ => {
-            println!("menu item {:?} not handled", event.id);
+        "show" => {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
         }
+        "hide" => {
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.hide();
+            }
+        }
+        _ => {}
     }
-});
+}
 
-TrayIconBuilder::new().on_tray_icon_event(|tray, event| {
-    match event {
-        TrayIconEvent::Click {
-            button: MouseButton::Left,
-            button_state: MouseButtonState::Up,
-            ..
-        } => {
-            println!("left click pressed and released");
-            // in this example, let's show and focus the main window when the tray is clicked
+fn handle_tray_icon_event(tray: &TrayIcon, event: TrayIconEvent) {
+    if let TrayIconEvent::Click { click_type, .. } = event {
+        if click_type == ClickType::Left {
             let app = tray.app_handle();
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.show();
                 let _ = window.set_focus();
             }
         }
-        _ => {
-            println!("unhandled event {event:?}");
-        }
     }
-});
+}

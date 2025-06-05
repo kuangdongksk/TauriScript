@@ -1,11 +1,14 @@
+import { TrayIcon } from "@tauri-apps/api/tray";
+import { useCallback } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
-
-// 组件导入
 import BreakOverlay from "./pages/Pomodoro/BreakOverlay";
 import Pomodoro from "./pages/Pomodoro/Pomodoro";
+import { options } from "./utils/tray";
 
 function App() {
+  const tray = useCallback(async () => await TrayIcon.new(options), []);
+
   return (
     <div className="flex h-screen ">
       {/* 主应用路由 */}
