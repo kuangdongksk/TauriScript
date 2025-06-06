@@ -1,6 +1,6 @@
 use tauri::{
-    menu::{Menu, MenuEvent, MenuItem},
-    tray::{TrayIcon, TrayIconBuilder, TrayIconEvent},
+    menu::{ Menu, MenuEvent, MenuItem },
+    tray::{ TrayIcon, TrayIconBuilder, TrayIconEvent },
     Manager,
 };
 
@@ -15,6 +15,7 @@ pub fn create_tray(app: &tauri::AppHandle) -> Result<TrayIcon, Box<dyn std::erro
 
     // 创建托盘图标
     let tray = TrayIconBuilder::new()
+        // .icon("../../icons/icon.ico")
         .menu(&menu)
         .show_menu_on_left_click(true) // 左键点击时显示菜单
         .on_menu_event(move |app, event| {
@@ -50,20 +51,15 @@ fn handle_menu_event(app: &tauri::AppHandle, event: MenuEvent) {
 
 fn handle_tray_icon_event(_tray: &TrayIcon, event: TrayIconEvent) {
     match event {
-        TrayIconEvent::Click {
-            button,
-            button_state,
-            position,
-            ..
-        } => {
+        TrayIconEvent::Click { button, button_state, position, .. } => {
             println!(
                 "托盘图标被点击: 按钮={:?}, 状态={:?}, 位置={:?}",
-                button, button_state, position
+                button,
+                button_state,
+                position
             );
         }
-        TrayIconEvent::DoubleClick {
-            button, position, ..
-        } => {
+        TrayIconEvent::DoubleClick { button, position, .. } => {
             println!("托盘图标被双击: 按钮={:?}, 位置={:?}", button, position);
         }
         TrayIconEvent::Enter { position, .. } => {
