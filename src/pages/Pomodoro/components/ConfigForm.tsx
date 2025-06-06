@@ -70,12 +70,11 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
             专注时间（分钟）
           </label>
           <input
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             type="number"
             id="focusTime"
             value={config.focusTime}
             onChange={(e) => handleConfigChange(e, "focusTime")}
-            min="1"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
 
@@ -87,12 +86,11 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
             休息时间（分钟）
           </label>
           <input
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             type="number"
             id="breakTime"
             value={config.breakTime}
             onChange={(e) => handleConfigChange(e, "breakTime")}
-            min="1"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
 
