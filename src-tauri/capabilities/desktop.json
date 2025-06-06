@@ -1,10 +1,12 @@
 {
   "identifier": "desktop-capability",
   "platforms": ["macOS", "windows", "linux"],
-  "local": false,
   "windows": ["main"],
-  "webview": ["main"],
-  "URL": ["http://localhost:1420"],
+  "webviews": ["main"],
+  "remote": {
+    "urls": ["http://localhost:1420/"]
+  },
+  "local": false,
   "permissions": [
     "autostart:default",
     "autostart:allow-enable",
