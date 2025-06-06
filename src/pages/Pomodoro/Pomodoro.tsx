@@ -12,9 +12,9 @@ const Pomodoro = () => {
 
   // 番茄钟配置
   const [config, setConfig] = useState<PomodoroConfig>({
-    focusTime: 1,
-    breakTime: 1,
-    cycles: 4,
+    focusTime: 25,
+    breakTime: 5,
+    cycles: 30,
   });
 
   // 计时器状态

@@ -1,15 +1,15 @@
-import { options } from "@/utils/tray";
+// import { options } from "@/utils/tray";
 import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { TrayIcon } from "@tauri-apps/api/tray";
-import { useCallback } from "react";
+// import { TrayIcon } from "@tauri-apps/api/tray";
+// import { useCallback } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import BreakOverlay from "../Pomodoro/BreakOverlay";
 import Pomodoro from "../Pomodoro/Pomodoro";
 import Setting from "../Setting/Setting";
 
 function Home() {
-  const tray = useCallback(async () => await TrayIcon.new(options), []);
+  // const tray = useCallback(async () => await TrayIcon.new(options), []);
 
   return (
     <Routes>
