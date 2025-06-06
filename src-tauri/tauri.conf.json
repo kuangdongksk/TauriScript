@@ -1,11 +1,14 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "identifier": "com.desktop-tools.dev",
-  "productName": "desktop-tools",
+  "productName": "ks'tools",
   "version": "0.0.1",
   "build": {
     "beforeBuildCommand": "pnpm run build",
-    "beforeDevCommand": "pnpm run dev"
+    "beforeDevCommand": "pnpm run dev",
+
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420/"
   },
   "app": {
     "security": {
@@ -18,8 +21,7 @@
         "width": 1024,
         "height": 768,
         "resizable": true,
-        "fullscreen": false,
-        "url": "http://localhost:1420"
+        "fullscreen": false
       }
     ]
   },
