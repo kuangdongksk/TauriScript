@@ -1,20 +1,23 @@
 import Button from "@/components/Button";
+import { breakTimeAtom, pomodoroStatusAtom } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { useAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
-import { useBreakStore } from "../../store/breakStore";
+import { TPomodoroStatus } from "./Pomodoro";
 
 dayjs.extend(duration);
 
 const BreakOverlay = () => {
-  const { 休息时间, 推迟休息时间: 延长休息时间, 结束休息 } = useBreakStore();
+  const [休息时间] = useAtom(breakTimeAtom);
+  const [, setPomodoroStatus] = useAtom<TPomodoroStatus>(pomodoroStatusAtom);
 
   const [剩余休息时间, 令剩余休息时间为] = useState(休息时间 * 60); // 剩余休息时间（秒）
 
   const 结束休息2 = useCallback(async () => {
     await invoke("end_break");
-    结束休息();
+    setPomodoroStatus("专注中");
   }, []);
 
   useEffect(() => {
@@ -44,7 +47,6 @@ const BreakOverlay = () => {
 
   const postponeBreak = async () => {
     await invoke("postpone_break", { minutes: 5 });
-    延长休息时间(5);
     令剩余休息时间为((prev) => prev + 5 * 60);
   };
 

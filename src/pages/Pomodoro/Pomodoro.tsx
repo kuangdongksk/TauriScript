@@ -1,14 +1,17 @@
+import Button from "@/components/Button";
+import { breakTimeAtom, pomodoroStatusAtom } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
+import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { useBreakStore } from "../../store/breakStore";
 import ConfigForm, { PomodoroConfig } from "./components/ConfigForm";
-import Button from "@/components/Button";
 
-export type TPomodoroStatus = "准备就绪" | "专注中" | "休息中";
+export type TPomodoroStatus = "准备就绪" | "专注中" | "暂停中" | "休息中";
 
 const Pomodoro = () => {
-  const { 令休息时间为 } = useBreakStore();
+  const [, 令休息时间为] = useAtom(breakTimeAtom);
+  const [pomodoroStatus, setPomodoroStatus] =
+    useAtom<TPomodoroStatus>(pomodoroStatusAtom);
 
   // 番茄钟配置
   const [config, setConfig] = useState<PomodoroConfig>({
@@ -18,9 +21,7 @@ const Pomodoro = () => {
   });
 
   // 计时器状态
-  const [status, setStatus] = useState<TPomodoroStatus>("准备就绪");
   const [timeLeft, setTimeLeft] = useState(0); // 剩余时间（秒）
-  const [isActive, setIsActive] = useState(false); // 计时器是否激活
   const [currentCycle, setCurrentCycle] = useState(1); // 当前循环次数
 
   // 处理配置变更
@@ -31,30 +32,24 @@ const Pomodoro = () => {
 
   // 开始番茄钟
   const startTimer = () => {
-    if (status === "准备就绪") {
-      setStatus("专注中");
+    if (pomodoroStatus === "准备就绪") {
+      setPomodoroStatus("专注中");
       setTimeLeft(config.focusTime * 60);
       setCurrentCycle(1);
     }
-    setIsActive(true);
   };
 
   // 暂停番茄钟
   const pauseTimer = () => {
-    setIsActive(false);
+    setPomodoroStatus("暂停中");
   };
 
   // 重置番茄钟
   const resetTimer = () => {
-    setIsActive(false);
-    setStatus("准备就绪");
+    setPomodoroStatus("准备就绪");
     setTimeLeft(0);
     setCurrentCycle(1);
   };
-
-  // 监听休息结束状态
-  const { 休息是否结束: isBreakEnded, 开始休息: resetBreakEnded } =
-    useBreakStore();
 
   // 初始化
   useEffect(() => {
@@ -62,50 +57,42 @@ const Pomodoro = () => {
   }, []);
 
   useEffect(() => {
-    if (isBreakEnded) {
-      // 休息结束，开始新的专注时间
-      if (currentCycle < config.cycles) {
-        // 还有循环，继续专注
-        setCurrentCycle((prev) => prev + 1);
-        setStatus("专注中");
-        setTimeLeft(config.focusTime * 60);
-        setIsActive(true);
-      } else {
-        // 所有循环完成
-        resetTimer();
-      }
-      // 重置休息结束状态
-      resetBreakEnded();
+    // 休息结束，开始新的专注时间
+    if (currentCycle < config.cycles) {
+      // 还有循环，继续专注
+      setCurrentCycle((prev) => prev + 1);
+      setPomodoroStatus("专注中");
+      setTimeLeft(config.focusTime * 60);
+    } else {
+      // 所有循环完成
+      resetTimer();
     }
-  }, [
-    isBreakEnded,
-    config.cycles,
-    config.focusTime,
-    currentCycle,
-    resetBreakEnded,
-  ]);
+  }, [config.cycles, config.focusTime, currentCycle]);
 
   // 处理计时器逻辑
   useEffect(() => {
     let interval: number | undefined;
 
-    if (isActive && timeLeft > 0) {
+    if (["专注中", "休息中"].includes(pomodoroStatus) && timeLeft > 0) {
       interval = window.setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
-    } else if (isActive && timeLeft === 0) {
+    } else if (
+      ["专注中", "休息中"].includes(pomodoroStatus) &&
+      timeLeft === 0
+    ) {
       // 时间结束，切换状态
-      if (status === "专注中") {
+      if (pomodoroStatus === "专注中") {
         // 专注时间结束，显示休息提醒
         showBreakOverlay();
-        setStatus("休息中");
+        setPomodoroStatus("休息中");
         setTimeLeft(config.breakTime * 60);
-      } else if (status === "休息中") {
+      } else if (pomodoroStatus === "休息中") {
         // 休息时间结束
         if (currentCycle < config.cycles) {
           // 还有循环，继续专注
           setCurrentCycle((prev) => prev + 1);
-          setStatus("专注中");
+          setPomodoroStatus("专注中");
           setTimeLeft(config.focusTime * 60);
         } else {
           // 所有循环完成
@@ -117,7 +104,7 @@ const Pomodoro = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft, status, currentCycle, config]);
+  }, [pomodoroStatus, timeLeft, pomodoroStatus, currentCycle, config]);
 
   const showBreakOverlay = async () => {
     令休息时间为(config.breakTime);
@@ -143,26 +130,26 @@ const Pomodoro = () => {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center">
           <div
             className={`w-64 h-64 rounded-full border-8 ${
-              status === "专注中"
+              pomodoroStatus === "专注中"
                 ? "border-red-500"
-                : status === "休息中"
+                : pomodoroStatus === "休息中"
                 ? "border-green-500"
                 : "border-gray-300 dark:border-gray-600"
             } flex items-center justify-center mb-6`}
           >
             <div className="text-center">
               <div className="text-4xl font-bold text-gray-800 dark:text-white">
-                {status === "准备就绪"
+                {pomodoroStatus === "准备就绪"
                   ? "--:--"
                   : dayjs.duration(timeLeft, "seconds").format("mm:ss")}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                {status}
+                {pomodoroStatus}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                 休息时间 {config.breakTime} 分钟
               </div>
-              {status !== "准备就绪" && (
+              {pomodoroStatus !== "准备就绪" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   循环 {currentCycle}/{config.cycles}
                 </div>
@@ -171,12 +158,12 @@ const Pomodoro = () => {
           </div>
 
           <div className="flex space-x-4">
-            {!isActive ? (
+            {["准备就绪", "暂停中"].includes(pomodoroStatus) ? (
               <Button
                 onClick={startTimer}
                 className="bg-blue-500  hover:bg-blue-600 focus:ring-blue-500 "
               >
-                {status === "准备就绪" ? "开始" : "继续"}
+                {pomodoroStatus === "准备就绪" ? "开始" : "继续"}
               </Button>
             ) : (
               <Button
