@@ -9,14 +9,13 @@ import ConfigForm, { PomodoroConfig } from "./components/ConfigForm";
 export type TPomodoroStatus = "准备就绪" | "专注中" | "暂停中" | "休息中";
 
 const Pomodoro = () => {
-  const [, 令休息时间为] = useAtom(breakTimeAtom);
+  const [breakTime, 令休息时间为] = useAtom(breakTimeAtom);
   const [pomodoroStatus, setPomodoroStatus] =
     useAtom<TPomodoroStatus>(pomodoroStatusAtom);
 
   // 番茄钟配置
-  const [config, setConfig] = useState<PomodoroConfig>({
+  const [config, setConfig] = useState<Omit<PomodoroConfig, "breakTime">>({
     focusTime: 25,
-    breakTime: 5,
     cycles: 30,
   });
 
@@ -53,7 +52,7 @@ const Pomodoro = () => {
 
   // 初始化
   useEffect(() => {
-    令休息时间为(config.breakTime);
+    令休息时间为(breakTime);
   }, []);
 
   useEffect(() => {
@@ -86,7 +85,7 @@ const Pomodoro = () => {
         // 专注时间结束，显示休息提醒
         showBreakOverlay();
         setPomodoroStatus("休息中");
-        setTimeLeft(config.breakTime * 60);
+        setTimeLeft(breakTime * 60);
       } else if (pomodoroStatus === "休息中") {
         // 休息时间结束
         if (currentCycle < config.cycles) {
@@ -107,11 +106,11 @@ const Pomodoro = () => {
   }, [pomodoroStatus, timeLeft, pomodoroStatus, currentCycle, config]);
 
   const showBreakOverlay = async () => {
-    令休息时间为(config.breakTime);
+    令休息时间为(breakTime);
 
     await invoke("show_break_overlay", {
       params: {
-        break_time: config.breakTime,
+        break_time: breakTime,
       },
     });
   };
@@ -124,7 +123,10 @@ const Pomodoro = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* 番茄钟设置 */}
-        <ConfigForm config={config} onConfigChange={handleConfigChange} />
+        <ConfigForm
+          config={{ ...config, breakTime: breakTime }}
+          onConfigChange={handleConfigChange}
+        />
 
         {/* 番茄钟计时器 */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center">
@@ -147,7 +149,7 @@ const Pomodoro = () => {
                 {pomodoroStatus}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                休息时间 {config.breakTime} 分钟
+                休息时间 {breakTime} 分钟
               </div>
               {pomodoroStatus !== "准备就绪" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">

@@ -1,5 +1,6 @@
+import { breakTimeAtom } from "@/store/breakStore";
+import { useAtom } from "jotai";
 import React from "react";
-import { useBreakStore } from "../../../store/breakStore";
 
 export interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
@@ -13,7 +14,7 @@ interface ConfigFormProps {
 }
 
 const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
-  const { 令休息时间为: setGlobalBreakTime } = useBreakStore();
+  const [breakTime, setBreakTime] = useAtom(breakTimeAtom);
 
   // 保存配置
   const [savedConfigs, setSavedConfigs] = React.useState<
@@ -30,7 +31,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
     const newConfig = { ...config, [field]: value };
     onConfigChange(newConfig);
     if (field === "breakTime") {
-      setGlobalBreakTime(value);
+      setBreakTime(value);
     }
   };
 
