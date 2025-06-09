@@ -8,7 +8,7 @@ import { useBreakStore } from "../../store/breakStore";
 dayjs.extend(duration);
 
 const BreakOverlay = () => {
-  const { 休息时间, 延长休息时间, 结束休息 } = useBreakStore();
+  const { 休息时间, 推迟休息时间: 延长休息时间, 结束休息 } = useBreakStore();
 
   const [剩余休息时间, 令剩余休息时间为] = useState(休息时间 * 60); // 剩余休息时间（秒）
 

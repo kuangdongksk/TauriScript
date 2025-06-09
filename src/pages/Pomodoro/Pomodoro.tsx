@@ -5,7 +5,7 @@ import { useBreakStore } from "../../store/breakStore";
 import ConfigForm, { PomodoroConfig } from "./components/ConfigForm";
 import Button from "@/components/Button";
 
-type TimerStatus = "准备就绪" | "专注中" | "休息中";
+export type TPomodoroStatus = "准备就绪" | "专注中" | "休息中";
 
 const Pomodoro = () => {
   const { 令休息时间为 } = useBreakStore();
@@ -18,7 +18,7 @@ const Pomodoro = () => {
   });
 
   // 计时器状态
-  const [status, setStatus] = useState<TimerStatus>("准备就绪");
+  const [status, setStatus] = useState<TPomodoroStatus>("准备就绪");
   const [timeLeft, setTimeLeft] = useState(0); // 剩余时间（秒）
   const [isActive, setIsActive] = useState(false); // 计时器是否激活
   const [currentCycle, setCurrentCycle] = useState(1); // 当前循环次数
@@ -55,6 +55,11 @@ const Pomodoro = () => {
   // 监听休息结束状态
   const { 休息是否结束: isBreakEnded, 开始休息: resetBreakEnded } =
     useBreakStore();
+
+  // 初始化
+  useEffect(() => {
+    令休息时间为(config.breakTime);
+  }, []);
 
   useEffect(() => {
     if (isBreakEnded) {
@@ -153,6 +158,9 @@ const Pomodoro = () => {
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                 {status}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                休息时间 {config.breakTime} 分钟
               </div>
               {status !== "准备就绪" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
