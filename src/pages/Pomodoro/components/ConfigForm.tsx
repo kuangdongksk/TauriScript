@@ -14,6 +14,7 @@ import {
   LoopTimesAtom,
 } from "@/store/breakStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { invoke } from "@tauri-apps/api/core";
 import { useAtom } from "jotai";
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -60,8 +61,14 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   const [configName, setConfigName] = React.useState("");
 
   // 保存当前配置
-  const saveConfig = () => {
-    if (configName.trim() === "") return;
+  const saveConfig = async () => {
+    if (configName.trim() === "") {
+      form.setError("root", {
+        type: "manual",
+        message: "请输入配置名称",
+      });
+      return;
+    }
 
     const newConfig = {
       focusTime,
@@ -69,11 +76,37 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
       loopTimes,
       name: configName,
     };
-    setSavedConfigs([...savedConfigs, newConfig]);
-    setConfigName("");
 
-    // TODO 调用 Tauri 命令保存配置
-    // invoke("save_pomodoro_config", { config: newConfig });
+    try {
+      // 调用 Tauri 命令保存配置
+      await invoke("save_pomodoro_config", { config: newConfig });
+      setSavedConfigs([...savedConfigs, newConfig]);
+      setConfigName("");
+      form.clearErrors();
+    } catch (error) {
+      form.setError("root", {
+        type: "manual",
+        message: "保存配置失败：" + (error as Error).message,
+      });
+    }
+  };
+
+  // 删除保存的配置
+  const deleteConfig = async (
+    configToDelete: PomodoroConfig & { name: string }
+  ) => {
+    try {
+      // 调用 Tauri 命令删除配置
+      await invoke("delete_pomodoro_config", { name: configToDelete.name });
+      setSavedConfigs(
+        savedConfigs.filter((config) => config.name !== configToDelete.name)
+      );
+    } catch (error) {
+      form.setError("root", {
+        type: "manual",
+        message: "删除配置失败：" + (error as Error).message,
+      });
+    }
   };
 
   // 加载保存的配置

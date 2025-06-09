@@ -1,4 +1,4 @@
-import Button from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import { BreakTimeAtom, PomodoroStatusAtom } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
@@ -12,25 +12,25 @@ const BreakOverlay = () => {
   const breakTime = useAtomValue(BreakTimeAtom);
   const [, setPomodoroStatus] = useAtom(PomodoroStatusAtom);
 
-  const [剩余休息时间, 令剩余休息时间为] = useState(breakTime * 60); // 剩余休息时间（秒）
+  const [remainingTime, setRemainingTime] = useState(breakTime * 60); // 剩余休息时间（秒）
 
-  const 结束休息2 = useCallback(async () => {
+  const endBreak = useCallback(async () => {
     await invoke("end_break");
     setPomodoroStatus("专注中");
-  }, []);
+  }, [setPomodoroStatus]);
 
   useEffect(() => {
-    令剩余休息时间为(breakTime * 60);
+    setRemainingTime(breakTime * 60);
   }, [breakTime]);
 
   useEffect(() => {
-    if (剩余休息时间 <= 0) {
-      结束休息2();
+    if (remainingTime <= 0) {
+      endBreak();
       return;
     }
 
     const interval = setInterval(() => {
-      令剩余休息时间为((prev) => {
+      setRemainingTime((prev) => {
         const next = prev <= 1 ? 0 : prev - 1;
         if (next === 0) {
           clearInterval(interval);
@@ -42,17 +42,18 @@ const BreakOverlay = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [剩余休息时间]);
+  }, [remainingTime, endBreak]);
 
   const postponeBreak = async () => {
-    await invoke("end_break");
-    setPomodoroStatus("专注中");
+    // 增加5分钟休息时间
+    const additionalTime = 5 * 60; // 5分钟转换为秒
+    setRemainingTime(prev => prev + additionalTime);
   };
 
   return (
-    <div className="w-full h-full fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="max-w-md w-full rounded-lg p-8 text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">breakTime</h2>
+    <div className="w-full h-full fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="max-w-md w-full bg-white/10 rounded-xl p-8 text-center shadow-lg">
+        <h2 className="text-2xl font-bold text-white mb-2">休息时间</h2>
         <p className="text-gray-300 mb-6">请离开电脑，休息一下眼睛和身体</p>
 
         <div className="relative h-4 rounded-full mb-8">
@@ -61,7 +62,7 @@ const BreakOverlay = () => {
             style={{
               width: `${
                 breakTime > 0
-                  ? ((breakTime - 剩余休息时间) / breakTime) * 100
+                  ? Math.max(0, Math.min(100, ((breakTime * 60 - remainingTime) / (breakTime * 60)) * 100))
                   : 0
               }%`,
             }}
@@ -69,19 +70,20 @@ const BreakOverlay = () => {
         </div>
 
         <div className="text-5xl font-bold text-white mb-8">
-          {dayjs.duration(剩余休息时间, "seconds").format("mm:ss")}
+          {dayjs.duration(remainingTime, "seconds").format("mm:ss")}
         </div>
 
         <div className="flex space-x-4 justify-center">
           <Button
             onClick={postponeBreak}
-            className=" bg-gray-600 hover:bg-gray-500 focus:ring-gray-500 focus:ring-offset-gray-800"
+            variant="outline"
+            className="min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white border-gray-500"
           >
-            稍后休息 (+5分钟)
+            +5分钟
           </Button>
           <Button
-            onClick={结束休息2}
-            className=" bg-green-600 hover:bg-green-500 focus:ring-green-500 focus:ring-offset-gray-800"
+            onClick={endBreak}
+            className="min-w-[140px] bg-green-600 hover:bg-green-500"
           >
             开始专注
           </Button>
