@@ -1,20 +1,57 @@
-import { breakTimeAtom } from "@/store/breakStore";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  BreakTimeAtom,
+  FocusTimeAtom,
+  LoopTimesAtom,
+} from "@/store/breakStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAtom } from "jotai";
-import React from "react";
+import React, { useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 export interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
   breakTime: number; // 休息时间（分钟）
-  cycles: number; // 循环次数
+  loopTimes: number; // 循环次数
 }
 
-interface ConfigFormProps {
-  config: PomodoroConfig;
-  onConfigChange: (newConfig: PomodoroConfig) => void;
-}
+interface ConfigFormProps {}
 
-const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
-  const [breakTime, setBreakTime] = useAtom(breakTimeAtom);
+const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
+  const [breakTime, setBreakTime] = useAtom(BreakTimeAtom);
+  const [focusTime, setFocusTime] = useAtom(FocusTimeAtom);
+  const [loopTimes, setLoopTimes] = useAtom(LoopTimesAtom);
+
+  const formSchema = z.object({
+    focusTime: z.number().min(1).max(60), // 专注时间（分钟）
+    breakTime: z.number().min(1).max(60), // 休息时间（分钟）
+    loopTimes: z.number().min(1).max(100), // 循环次数
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      focusTime,
+      breakTime,
+      loopTimes,
+    },
+  });
+
+  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
+    setFocusTime(values.focusTime);
+    setBreakTime(values.breakTime);
+    setLoopTimes(values.loopTimes);
+  }, []);
 
   // 保存配置
   const [savedConfigs, setSavedConfigs] = React.useState<
@@ -22,24 +59,16 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
   >([]);
   const [configName, setConfigName] = React.useState("");
 
-  // 处理配置变更
-  const handleConfigChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: keyof PomodoroConfig
-  ) => {
-    const value = parseInt(e.target.value) || 0;
-    const newConfig = { ...config, [field]: value };
-    onConfigChange(newConfig);
-    if (field === "breakTime") {
-      setBreakTime(value);
-    }
-  };
-
   // 保存当前配置
   const saveConfig = () => {
     if (configName.trim() === "") return;
 
-    const newConfig = { ...config, name: configName };
+    const newConfig = {
+      focusTime,
+      breakTime,
+      loopTimes,
+      name: configName,
+    };
     setSavedConfigs([...savedConfigs, newConfig]);
     setConfigName("");
 
@@ -49,11 +78,9 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
 
   // 加载保存的配置
   const loadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
-    onConfigChange({
-      focusTime: savedConfig.focusTime,
-      breakTime: savedConfig.breakTime,
-      cycles: savedConfig.cycles,
-    });
+    setFocusTime(savedConfig.focusTime);
+    setBreakTime(savedConfig.breakTime);
+    setLoopTimes(savedConfig.loopTimes);
   };
 
   return (
@@ -62,74 +89,50 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
         设置
       </h2>
 
-      <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="focusTime"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            专注时间（分钟）
-          </label>
-          <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            type="number"
-            id="focusTime"
-            value={config.focusTime}
-            onChange={(e) => handleConfigChange(e, "focusTime")}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="focusTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>专注时间</FormLabel>
+                <FormControl>
+                  <Input placeholder="专注时间" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-
-        <div>
-          <label
-            htmlFor="breakTime"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            休息时间（分钟）
-          </label>
-          <input
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            type="number"
-            id="breakTime"
-            value={config.breakTime}
-            onChange={(e) => handleConfigChange(e, "breakTime")}
+          <FormField
+            control={form.control}
+            name="breakTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>休息时间</FormLabel>
+                <FormControl>
+                  <Input placeholder="休息时间" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-
-        <div>
-          <label
-            htmlFor="cycles"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            循环次数
-          </label>
-          <input
-            type="number"
-            id="cycles"
-            value={config.cycles}
-            onChange={(e) => handleConfigChange(e, "cycles")}
-            min="1"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          <FormField
+            control={form.control}
+            name="loopTimes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>循环次数</FormLabel>
+                <FormControl>
+                  <Input placeholder="循环次数" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-
-        <div className="pt-2">
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={configName}
-              onChange={(e) => setConfigName(e.target.value)}
-              placeholder="配置名称"
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-            <button
-              onClick={saveConfig}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              保存
-            </button>
-          </div>
-        </div>
-      </div>
+          <Button type="submit">应用</Button>
+        </form>
+      </Form>
 
       {/* 已保存的配置 */}
       {savedConfigs.length > 0 && (
@@ -145,7 +148,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({ config, onConfigChange }) => {
               >
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {saved.name} ({saved.focusTime}分钟专注 / {saved.breakTime}
-                  分钟休息 x {saved.cycles}循环)
+                  分钟休息 x {loopTimes}循环)
                 </span>
                 <button
                   onClick={() => loadConfig(saved)}

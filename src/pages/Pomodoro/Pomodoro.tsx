@@ -1,40 +1,41 @@
 import Button from "@/components/Button";
-import { breakTimeAtom, pomodoroStatusAtom } from "@/store/breakStore";
+import {
+  BreakTimeAtom,
+  currentBreakAtom,
+  currentFocusAtom,
+  currentLoopAtom,
+  FocusTimeAtom,
+  LoopTimesAtom,
+  PomodoroStatusAtom,
+} from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import ConfigForm, { PomodoroConfig } from "./components/ConfigForm";
+import ConfigForm from "./components/ConfigForm";
 
 export type TPomodoroStatus = "准备就绪" | "专注中" | "暂停中" | "休息中";
 
 const Pomodoro = () => {
-  const [breakTime, 令休息时间为] = useAtom(breakTimeAtom);
-  const [pomodoroStatus, setPomodoroStatus] =
-    useAtom<TPomodoroStatus>(pomodoroStatusAtom);
+  const breakTime = useAtomValue(BreakTimeAtom);
+  const focusTime = useAtomValue(FocusTimeAtom);
+  const loopTimes = useAtomValue(LoopTimesAtom);
 
-  // 番茄钟配置
-  const [config, setConfig] = useState<Omit<PomodoroConfig, "breakTime">>({
-    focusTime: 25,
-    cycles: 30,
-  });
+  const [currentFocusTime, setCurrentFocusTime] = useAtom(currentFocusAtom);
+  const [currentBreakTime, setCurrentBreakTime] = useAtom(currentBreakAtom);
+  const [currentLoop, setCurrentLoop] = useAtom(currentLoopAtom);
+  const [pomodoroStatus, setPomodoroStatus] =
+    useAtom<TPomodoroStatus>(PomodoroStatusAtom);
 
   // 计时器状态
   const [timeLeft, setTimeLeft] = useState(0); // 剩余时间（秒）
-  const [currentCycle, setCurrentCycle] = useState(1); // 当前循环次数
-
-  // 处理配置变更
-  const handleConfigChange = (newConfig: PomodoroConfig) => {
-    setConfig(newConfig);
-    令休息时间为(newConfig.breakTime);
-  };
 
   // 开始番茄钟
   const startTimer = () => {
     if (pomodoroStatus === "准备就绪") {
       setPomodoroStatus("专注中");
-      setTimeLeft(config.focusTime * 60);
-      setCurrentCycle(1);
+      setTimeLeft(currentFocusTime * 60);
+      setCurrentLoop(1);
     }
   };
 
@@ -47,55 +48,58 @@ const Pomodoro = () => {
   const resetTimer = () => {
     setPomodoroStatus("准备就绪");
     setTimeLeft(0);
-    setCurrentCycle(1);
+    setCurrentLoop(0);
   };
 
   // 初始化
   useEffect(() => {
-    令休息时间为(breakTime);
+    setCurrentBreakTime(breakTime);
+    setCurrentFocusTime(focusTime);
   }, []);
 
   useEffect(() => {
+    if (pomodoroStatus === "准备就绪") {
+      return;
+    }
     // 休息结束，开始新的专注时间
-    if (currentCycle < config.cycles) {
+    if (currentLoop < loopTimes) {
       // 还有循环，继续专注
-      setCurrentCycle((prev) => prev + 1);
+      setCurrentLoop((prev) => prev + 1);
       setPomodoroStatus("专注中");
-      setTimeLeft(config.focusTime * 60);
+      setTimeLeft(currentFocusTime * 60);
     } else {
       // 所有循环完成
       resetTimer();
     }
-  }, [config.cycles, config.focusTime, currentCycle]);
+  }, [loopTimes, currentFocusTime, currentLoop]);
 
   // 处理计时器逻辑
   useEffect(() => {
     let interval: number | undefined;
 
-    if (["专注中", "休息中"].includes(pomodoroStatus) && timeLeft > 0) {
-      interval = window.setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
-    } else if (
-      ["专注中", "休息中"].includes(pomodoroStatus) &&
-      timeLeft === 0
-    ) {
-      // 时间结束，切换状态
-      if (pomodoroStatus === "专注中") {
-        // 专注时间结束，显示休息提醒
-        showBreakOverlay();
-        setPomodoroStatus("休息中");
-        setTimeLeft(breakTime * 60);
-      } else if (pomodoroStatus === "休息中") {
-        // 休息时间结束
-        if (currentCycle < config.cycles) {
-          // 还有循环，继续专注
-          setCurrentCycle((prev) => prev + 1);
-          setPomodoroStatus("专注中");
-          setTimeLeft(config.focusTime * 60);
-        } else {
-          // 所有循环完成
-          resetTimer();
+    if (["专注中", "休息中"].includes(pomodoroStatus)) {
+      if (timeLeft > 0) {
+        interval = window.setInterval(() => {
+          setTimeLeft((prevTime) => prevTime - 1);
+        }, 1000);
+      } else {
+        // 时间结束，切换状态
+        if (pomodoroStatus === "专注中") {
+          // 专注时间结束，显示休息提醒
+          showBreakOverlay();
+          setPomodoroStatus("休息中");
+          setTimeLeft(currentBreakTime * 60);
+        } else if (pomodoroStatus === "休息中") {
+          // 休息时间结束
+          if (currentLoop < loopTimes) {
+            // 还有循环，继续专注
+            setCurrentLoop((prev) => prev + 1);
+            setPomodoroStatus("专注中");
+            setTimeLeft(currentFocusTime * 60);
+          } else {
+            // 所有循环完成
+            resetTimer();
+          }
         }
       }
     }
@@ -103,14 +107,19 @@ const Pomodoro = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [pomodoroStatus, timeLeft, pomodoroStatus, currentCycle, config]);
+  }, [
+    pomodoroStatus,
+    timeLeft,
+    pomodoroStatus,
+    currentLoop,
+    currentBreakTime,
+    loopTimes,
+  ]);
 
   const showBreakOverlay = async () => {
-    令休息时间为(breakTime);
-
     await invoke("show_break_overlay", {
       params: {
-        break_time: breakTime,
+        break_time: currentBreakTime,
       },
     });
   };
@@ -123,10 +132,7 @@ const Pomodoro = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* 番茄钟设置 */}
-        <ConfigForm
-          config={{ ...config, breakTime: breakTime }}
-          onConfigChange={handleConfigChange}
-        />
+        <ConfigForm />
 
         {/* 番茄钟计时器 */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex flex-col items-center justify-center">
@@ -149,11 +155,11 @@ const Pomodoro = () => {
                 {pomodoroStatus}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                休息时间 {breakTime} 分钟
+                休息时间 {currentBreakTime} 分钟
               </div>
               {pomodoroStatus !== "准备就绪" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  循环 {currentCycle}/{config.cycles}
+                  循环 {currentLoop}/{loopTimes}
                 </div>
               )}
             </div>

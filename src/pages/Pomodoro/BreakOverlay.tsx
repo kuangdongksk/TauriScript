@@ -1,19 +1,18 @@
 import Button from "@/components/Button";
-import { breakTimeAtom, pomodoroStatusAtom } from "@/store/breakStore";
+import { BreakTimeAtom, PomodoroStatusAtom } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
-import { TPomodoroStatus } from "./Pomodoro";
 
 dayjs.extend(duration);
 
 const BreakOverlay = () => {
-  const [休息时间] = useAtom(breakTimeAtom);
-  const [, setPomodoroStatus] = useAtom<TPomodoroStatus>(pomodoroStatusAtom);
+  const breakTime = useAtomValue(BreakTimeAtom);
+  const [, setPomodoroStatus] = useAtom(PomodoroStatusAtom);
 
-  const [剩余休息时间, 令剩余休息时间为] = useState(休息时间 * 60); // 剩余休息时间（秒）
+  const [剩余休息时间, 令剩余休息时间为] = useState(breakTime * 60); // 剩余休息时间（秒）
 
   const 结束休息2 = useCallback(async () => {
     await invoke("end_break");
@@ -21,8 +20,8 @@ const BreakOverlay = () => {
   }, []);
 
   useEffect(() => {
-    令剩余休息时间为(休息时间 * 60);
-  }, [休息时间]);
+    令剩余休息时间为(breakTime * 60);
+  }, [breakTime]);
 
   useEffect(() => {
     if (剩余休息时间 <= 0) {
@@ -46,14 +45,14 @@ const BreakOverlay = () => {
   }, [剩余休息时间]);
 
   const postponeBreak = async () => {
-    await invoke("postpone_break", { minutes: 5 });
-    令剩余休息时间为((prev) => prev + 5 * 60);
+    await invoke("end_break");
+    setPomodoroStatus("专注中");
   };
 
   return (
     <div className="w-full h-full fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="max-w-md w-full rounded-lg p-8 text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">休息时间</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">breakTime</h2>
         <p className="text-gray-300 mb-6">请离开电脑，休息一下眼睛和身体</p>
 
         <div className="relative h-4 rounded-full mb-8">
@@ -61,7 +60,9 @@ const BreakOverlay = () => {
             className="absolute left-0 top-0 h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear"
             style={{
               width: `${
-                休息时间 > 0 ? ((休息时间 - 剩余休息时间) / 休息时间) * 100 : 0
+                breakTime > 0
+                  ? ((breakTime - 剩余休息时间) / breakTime) * 100
+                  : 0
               }%`,
             }}
           ></div>
