@@ -3,9 +3,9 @@
 
 mod module;
 use module::pomodoro::{
-  end_break,
-  postpone_break,
-  show_break_overlay,
+  pomodoro_postponeBreak,
+  pomodoro_endBreak,
+  pomodoro_showBreakOverlay,
   BreakState,
 };
 use module::tray::create_tray;
@@ -29,7 +29,11 @@ fn main() {
       Ok(())
     })
     .invoke_handler(
-      tauri::generate_handler![show_break_overlay, end_break, postpone_break]
+      tauri::generate_handler![
+        pomodoro_showBreakOverlay,
+        pomodoro_endBreak,
+        pomodoro_postponeBreak
+      ]
     )
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

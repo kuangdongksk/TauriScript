@@ -20,8 +20,8 @@ pub struct BreakParams {
 }
 
 // 显示休息提醒蒙层
-#[tauri::command(rename = "Pomodoro_showBreakOverlay")]
-pub async fn show_break_overlay(
+#[tauri::command(rename = "pomodoro_showBreakOverlay")]
+pub async fn pomodoro_showBreakOverlay(
   window: WebviewWindow,
   app_handle: tauri::AppHandle,
   break_state: tauri::State<'_, BreakState>,
@@ -68,8 +68,8 @@ pub async fn show_break_overlay(
 }
 
 // 结束休息
-#[tauri::command(rename = "Pomodoro_endBreak")]
-pub async fn end_break(
+#[tauri::command(rename = "pomodoro_endBreak")]
+pub async fn pomodoro_endBreak(
   app_handle: tauri::AppHandle,
   break_state: tauri::State<'_, BreakState>
 ) -> Result<(), String> {
@@ -87,8 +87,8 @@ pub async fn end_break(
 }
 
 // 延长休息时间
-#[tauri::command(rename = "Pomodoro_postponeBreak")]
-pub async fn postpone_break(
+#[tauri::command(rename = "pomodoro_postponeBreak")]
+pub async fn pomodoro_postponeBreak(
   break_state: tauri::State<'_, BreakState>,
   minutes: u32
 ) -> Result<(), String> {

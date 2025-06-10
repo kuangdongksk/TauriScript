@@ -1,4 +1,4 @@
-import { BaseDirectory, open, readFile } from "@tauri-apps/plugin-fs";
+import { BaseDirectory, readFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { PomodoroConfig } from "./ConfigForm";
@@ -44,24 +44,16 @@ export const saveConfig = async ({
   };
 
   setIsLoading(true);
-  await open("pomodoro.json", {
+  writeTextFile("pomodoro.json", JSON.stringify([...savedConfigs, newConfig]), {
     baseDir: BaseDirectory.AppConfig,
-    create: true,
-    write: true,
   })
-    .then((configFile) => {
-      configFile
-        .write(
-          new TextEncoder().encode(JSON.stringify([...savedConfigs, newConfig]))
-        )
-        .then(() => {
-          setSavedConfigs([...savedConfigs, newConfig]);
-          setConfigName("");
-          form.clearErrors();
-          toast.success("配置已保存", {
-            description: `已保存配置: ${configName}`,
-          });
-        });
+    .then(() => {
+      setSavedConfigs([...savedConfigs, newConfig]);
+      setConfigName("");
+      form.clearErrors();
+      toast.success("配置已保存", {
+        description: `已保存配置: ${configName}`,
+      });
     })
     .catch((error) => {
       console.error("保存配置失败：", error);
@@ -98,25 +90,20 @@ export const deleteConfig = async ({
 }) => {
   setIsLoading(true);
 
-  await open("pomodoro.json", {
+  const newConfig = savedConfigs.filter(
+    (config) => config.name !== configToDelete.name
+  );
+
+  writeTextFile("pomodoro.json", JSON.stringify(newConfig), {
     baseDir: BaseDirectory.AppConfig,
-    create: true,
-    write: true,
   })
-    .then((configFile) => {
-      const newConfig = savedConfigs.filter(
-        (config) => config.name !== configToDelete.name
-      );
-      configFile
-        .write(new TextEncoder().encode(JSON.stringify(newConfig)))
-        .then(() => {
-          setSavedConfigs(newConfig);
-          setConfigName("");
-          form.clearErrors();
-          toast.success("配置已删除", {
-            description: `已删除配置: ${configToDelete.name}`,
-          });
-        });
+    .then(() => {
+      setSavedConfigs(newConfig);
+      setConfigName("");
+      form.clearErrors();
+      toast.success("配置已删除", {
+        description: `已删除配置: ${configToDelete.name}`,
+      });
     })
     .catch((error) => {
       form.setError("root", {
@@ -162,7 +149,7 @@ export const loadConfig = ({
       description: `已加载配置: ${savedConfig.name}`,
     });
   } catch (error) {
-    console.error("Failed to load config:", error);
+    console.error("加载配置失败:", error);
     toast.error("加载配置失败", {
       description: (error as Error).message,
     });
@@ -192,8 +179,7 @@ export const loadSavedConfigs = async ({
           const configs = JSON.parse(jsonStr ?? "");
           setSavedConfigs(Array.isArray(configs) ? configs : []);
         } catch (error) {
-          console.log("🚀 ~ error:", error);
-          throw new Error("配置文件格式错误");
+          throw new Error("配置文件格式错误" + error);
         }
       } else {
         setSavedConfigs([]);
@@ -202,7 +188,7 @@ export const loadSavedConfigs = async ({
   } catch (error) {
     console.error("无法加载已保存的配置:", error);
     toast.error("无法加载已保存的配置", {
-      description: (error as Error).message,
+      description: error as string,
     });
   } finally {
     setIsLoading(false);
