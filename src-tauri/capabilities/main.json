@@ -13,7 +13,12 @@
     "fs:default",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$APPDATA/*" }]
+      "allow": [
+        { "path": "$APPDATA/*" },
+        { "path": "$APPCONFIG/*" },
+        { "path": "$CONFIG/*" },
+        { "path": "$DATA/*" }
+      ]
     },
     "notification:default",
     "sql:default",
