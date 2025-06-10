@@ -8,20 +8,23 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { EPomodoroCommands } from "@/pages/Pomodoro/constant/enum";
 import {
   BreakTimeAtom,
   FocusTimeAtom,
   LoopTimesAtom,
 } from "@/store/breakStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoke } from "@tauri-apps/api/core";
-import { BaseDirectory, open } from "@tauri-apps/plugin-fs";
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import {
+  deleteConfig,
+  loadConfig,
+  loadSavedConfigs,
+  saveConfig,
+} from "./tools";
 
 export interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
@@ -80,140 +83,50 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   const [configName, setConfigName] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // 加载已保存的配置列表
-  const loadSavedConfigs = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const configs = await invoke<Array<PomodoroConfig & { name: string }>>(
-        EPomodoroCommands.GET_CONFIGS
-      );
-      setSavedConfigs(configs || []);
-    } catch (error) {
-      console.error("Failed to load saved configs:", error);
-      toast.error("无法加载已保存的配置", {
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   // 初始加载已保存的配置
   useEffect(() => {
-    loadSavedConfigs();
-  }, [loadSavedConfigs]);
+    loadSavedConfigs({ setSavedConfigs, setIsLoading });
+  }, []);
 
-  // 保存当前配置
-  const saveConfig = async () => {
-    if (configName.trim() === "") {
-      form.setError("root", {
-        type: "manual",
-        message: "请输入配置名称",
-      });
-      toast.error("请输入配置名称");
-      return;
-    }
-
-    const newConfig = {
+  // 保存当前配置的处理函数
+  const handleSaveConfig = async () => {
+    await saveConfig({
+      configName,
       focusTime,
       breakTime,
       loopTimes,
-      name: configName,
-    };
-
-    setIsLoading(true);
-    await open("./pomodoro.json", {
-      baseDir: BaseDirectory.Config,
-      create: true,
-    })
-      .then((configFile) => {
-        configFile
-          .write(new TextEncoder().encode(JSON.stringify(newConfig)))
-          .then(() => {
-            setSavedConfigs([...savedConfigs, newConfig]);
-            setConfigName("");
-            form.clearErrors();
-            toast.success("配置已保存", {
-              description: `已保存配置: ${configName}`,
-            });
-          });
-      })
-      .catch((error) => {
-        form.setError("root", {
-          type: "manual",
-          message: "保存配置失败：" + (error as Error).message,
-        });
-        toast.error("保存配置失败", {
-          description: (error as Error).message,
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      savedConfigs,
+      setSavedConfigs,
+      setConfigName,
+      setIsLoading,
+      form,
+    });
   };
 
-  // 删除保存的配置
-  const deleteConfig = async (
+  // 删除配置的处理函数
+  const handleDeleteConfig = async (
     configToDelete: PomodoroConfig & { name: string }
   ) => {
-    setIsLoading(true);
-
-    await open("./pomodoro.json", {
-      baseDir: BaseDirectory.Config,
-      create: true,
-    })
-      .then((configFile) => {
-        const newConfig = savedConfigs.filter(
-          (config) => config.name !== configToDelete.name
-        );
-        configFile
-          .write(new TextEncoder().encode(JSON.stringify(newConfig)))
-          .then(() => {
-            setSavedConfigs(newConfig);
-            setConfigName("");
-            form.clearErrors();
-            toast.success("配置已删除", {
-              description: `已删除配置: ${configToDelete.name}`,
-            });
-          });
-      })
-      .catch((error) => {
-        form.setError("root", {
-          type: "manual",
-          message: "删除配置失败：" + (error as Error).message,
-        });
-        toast.error("删除配置失败", {
-          description: (error as Error).message,
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    await deleteConfig({
+      configToDelete,
+      savedConfigs,
+      setSavedConfigs,
+      setConfigName,
+      setIsLoading,
+      form,
+    });
   };
 
-  // 加载保存的配置
-  const loadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
-    try {
-      setIsLoading(true);
-      setFocusTime(savedConfig.focusTime);
-      setBreakTime(savedConfig.breakTime);
-      setLoopTimes(savedConfig.loopTimes);
-      form.reset({
-        focusTime: savedConfig.focusTime,
-        breakTime: savedConfig.breakTime,
-        loopTimes: savedConfig.loopTimes,
-      });
-      toast.success("配置已加载", {
-        description: `已加载配置: ${savedConfig.name}`,
-      });
-    } catch (error) {
-      console.error("Failed to load config:", error);
-      toast.error("加载配置失败", {
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // 加载配置的处理函数
+  const handleLoadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
+    loadConfig({
+      savedConfig,
+      setFocusTime,
+      setBreakTime,
+      setLoopTimes,
+      setIsLoading,
+      form,
+    });
   };
 
   return (
@@ -231,7 +144,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
               <FormItem>
                 <FormLabel>专注时间</FormLabel>
                 <FormControl>
-                  <Input placeholder="专注时间" {...field} />
+                  <Input type="number" placeholder="专注时间" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -244,7 +157,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
               <FormItem>
                 <FormLabel>休息时间</FormLabel>
                 <FormControl>
-                  <Input placeholder="休息时间" {...field} />
+                  <Input type="number" placeholder="休息时间" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -257,7 +170,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
               <FormItem>
                 <FormLabel>循环次数</FormLabel>
                 <FormControl>
-                  <Input placeholder="循环次数" {...field} />
+                  <Input type="number" placeholder="循环次数" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -281,7 +194,11 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
             onChange={(e) => setConfigName(e.target.value)}
             className="max-w-[200px]"
           />
-          <Button onClick={saveConfig} variant="outline" disabled={isLoading}>
+          <Button
+            onClick={handleSaveConfig}
+            variant="outline"
+            disabled={isLoading}
+          >
             {isLoading ? "保存中..." : "保存配置"}
           </Button>
         </div>
@@ -309,7 +226,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
                   </div>
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => loadConfig(saved)}
+                      onClick={() => handleLoadConfig(saved)}
                       variant="secondary"
                       size="sm"
                       disabled={isLoading}
@@ -317,7 +234,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
                       {isLoading ? "加载中..." : "加载"}
                     </Button>
                     <Button
-                      onClick={() => deleteConfig(saved)}
+                      onClick={() => handleDeleteConfig(saved)}
                       variant="destructive"
                       size="sm"
                       disabled={isLoading}

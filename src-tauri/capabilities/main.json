@@ -11,6 +11,8 @@
     "core:default",
     "opener:default",
     "fs:default",
+    "fs:allow-appconfig-read-recursive",
+    "fs:allow-appconfig-write-recursive",
     {
       "identifier": "fs:allow-exists",
       "allow": [
