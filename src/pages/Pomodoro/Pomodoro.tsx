@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Timer, TimerStatus } from "@/components/Timer";
 import {
   BreakTimeAtom,
   currentBreakAtom,
@@ -9,7 +9,6 @@ import {
   PomodoroStatusAtom,
 } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
-import dayjs from "dayjs";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import ConfigForm from "./components/ConfigForm";
@@ -31,11 +30,19 @@ const Pomodoro = () => {
   // 计时器状态
   const [timeLeft, setTimeLeft] = useState(0); // 剩余时间（秒）
 
+  // 显示休息提醒
+  const showBreakOverlay = async () => {
+    await invoke(EPomodoroCommands.SHOW_BREAK_OVERLAY, {
+      params: {
+        break_time: currentBreakTime,
+      },
+    });
+  };
+
   // 开始番茄钟
   const startTimer = () => {
     if (pomodoroStatus === "准备就绪") {
       setPomodoroStatus("专注中");
-      setTimeLeft(currentFocusTime * 60);
       setCurrentLoop(1);
     } else if (pomodoroStatus === "暂停中") {
       // 从暂停状态恢复
@@ -68,13 +75,7 @@ const Pomodoro = () => {
     setCurrentFocusTime(focusTime);
   };
 
-  // 初始化
-  useEffect(() => {
-    setCurrentBreakTime(breakTime);
-    setCurrentFocusTime(focusTime);
-  }, [breakTime, focusTime]);
-
-  // 监听配置变化
+  // 初始化和监听配置变化
   useEffect(() => {
     if (pomodoroStatus === "准备就绪") {
       // 在准备就绪状态下，更新当前配置
@@ -83,84 +84,77 @@ const Pomodoro = () => {
     }
   }, [pomodoroStatus, breakTime, focusTime]);
 
-  // 处理计时器逻辑
-  useEffect(() => {
-    let interval: number | undefined;
+  // 将番茄钟状态映射到Timer组件状态
+  const mapPomodoroStatusToTimerStatus = (
+    status: TPomodoroStatus
+  ): TimerStatus => {
+    switch (status) {
+      case "准备就绪":
+        return "ready";
+      case "专注中":
+      case "休息中":
+        return "running";
+      case "暂停中":
+        return "paused";
+      default:
+        return "ready";
+    }
+  };
 
-    if (["专注中", "休息中"].includes(pomodoroStatus)) {
-      if (timeLeft > 0) {
-        interval = window.setInterval(() => {
-          setTimeLeft((prevTime) => {
-            // 确保时间不会变成负数
-            const newTime = Math.max(0, prevTime - 1);
+  // 获取当前阶段的总时间（秒）
+  const getCurrentPhaseTime = () => {
+    return pomodoroStatus === "休息中"
+      ? currentBreakTime * 60
+      : currentFocusTime * 60;
+  };
 
-            // 当时间到达0时，在下一个渲染周期处理状态切换
-            if (newTime === 0) {
-              // 使用setTimeout确保状态切换在下一个渲染周期
-              setTimeout(() => {
-                if (pomodoroStatus === "专注中") {
-                  // 专注时间结束，显示休息提醒
-                  showBreakOverlay();
-                  setPomodoroStatus("休息中");
-                  setTimeLeft(currentBreakTime * 60);
-                } else if (pomodoroStatus === "休息中") {
-                  // 休息时间结束
-                  if (currentLoop < loopTimes) {
-                    // 还有循环，继续专注
-                    setCurrentLoop((prev) => prev + 1);
-                    setPomodoroStatus("专注中");
-                    setTimeLeft(currentFocusTime * 60);
-                  } else {
-                    // 所有循环完成
-                    resetTimer();
-                  }
-                }
-              }, 0);
-            }
+  // 获取当前进度条颜色
+  const getProgressColor = () => {
+    switch (pomodoroStatus) {
+      case "专注中":
+        return "text-red-500 dark:text-red-400";
+      case "休息中":
+        return "text-green-500 dark:text-green-400";
+      default:
+        return "text-blue-500 dark:text-blue-400";
+    }
+  };
 
-            return newTime;
-          });
-        }, 1000);
+  // 处理Timer组件的状态变化
+  const handleStatusChange = (status: TimerStatus) => {
+    switch (status) {
+      case "running":
+        startTimer();
+        break;
+      case "paused":
+        pauseTimer();
+        break;
+      case "ready":
+        resetTimer();
+        break;
+    }
+  };
+
+  // 处理Timer组件的完成事件
+  const handleComplete = () => {
+    if (pomodoroStatus === "专注中") {
+      // 专注时间结束，显示休息提醒
+      showBreakOverlay();
+      setPomodoroStatus("休息中");
+      setTimeLeft(currentBreakTime * 60);
+    } else if (pomodoroStatus === "休息中") {
+      // 休息时间结束
+      if (currentLoop < loopTimes) {
+        // 还有循环，继续专注
+        setCurrentLoop((prev) => prev + 1);
+        setPomodoroStatus("专注中");
+        setTimeLeft(currentFocusTime * 60);
+      } else {
+        // 所有循环完成
+        resetTimer();
       }
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [
-    pomodoroStatus,
-    timeLeft,
-    currentLoop,
-    currentBreakTime,
-    currentFocusTime,
-    loopTimes,
-  ]);
-
-  const showBreakOverlay = async () => {
-    await invoke(EPomodoroCommands.SHOW_BREAK_OVERLAY, {
-      params: {
-        break_time: currentBreakTime,
-      },
-    });
   };
-
-  // 计算进度条百分比
-  const calculateProgress = () => {
-    if (pomodoroStatus === "准备就绪") return 0;
-
-    const totalTime =
-      pomodoroStatus === "专注中"
-        ? currentFocusTime * 60
-        : currentBreakTime * 60;
-
-    if (totalTime === 0) return 0;
-    return ((totalTime - timeLeft) / totalTime) * 100;
-  };
-
-  // 计算圆形进度条的周长
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const progress = calculateProgress();
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -176,67 +170,22 @@ const Pomodoro = () => {
 
         {/* 番茄钟计时器 */}
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
-          <div className="relative w-72 h-72 mb-8">
-            {/* 背景圆环 */}
-            <svg className="w-full h-full" viewBox="0 0 100 100">
-              <circle
-                className="text-gray-200 dark:text-gray-700 stroke-current"
-                strokeWidth="5"
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="transparent"
-              ></circle>
-
-              {/* 进度圆环 */}
-              <circle
-                className={`${
-                  pomodoroStatus === "专注中"
-                    ? "text-red-500 dark:text-red-400"
-                    : pomodoroStatus === "休息中"
-                    ? "text-green-500 dark:text-green-400"
-                    : "text-blue-500 dark:text-blue-400"
-                } stroke-current transition-all duration-1000 ease-linear`}
-                strokeWidth="5"
-                strokeLinecap="round"
-                cx="50"
-                cy="50"
-                r={radius}
-                fill="transparent"
-                strokeDasharray={circumference}
-                strokeDashoffset={
-                  circumference - (circumference * progress) / 100
-                }
-                transform="rotate(-90 50 50)"
-              ></circle>
-            </svg>
-
-            {/* 中间的时间显示 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-5xl font-bold text-gray-800 dark:text-white">
-                {pomodoroStatus === "准备就绪"
-                  ? "--:--"
-                  : dayjs.duration(timeLeft, "seconds").format("mm:ss")}
-              </div>
-              <div
-                className={`text-lg font-medium mt-2 ${
-                  pomodoroStatus === "专注中"
-                    ? "text-red-500 dark:text-red-400"
-                    : pomodoroStatus === "休息中"
-                    ? "text-green-500 dark:text-green-400"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
-              >
-                {pomodoroStatus}
-              </div>
-
-              {pomodoroStatus !== "准备就绪" && (
-                <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  循环 {currentLoop}/{loopTimes}
-                </div>
-              )}
-            </div>
-          </div>
+          <Timer
+            initialTime={getCurrentPhaseTime()}
+            status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
+            progressColor={getProgressColor()}
+            label={pomodoroStatus}
+            subLabel={
+              pomodoroStatus !== "准备就绪"
+                ? `循环 ${currentLoop}/${loopTimes}`
+                : undefined
+            }
+            onStatusChange={handleStatusChange}
+            onComplete={handleComplete}
+            onTimeChange={setTimeLeft}
+            onReset={resetTimer}
+            className="mb-8"
+          />
 
           {/* 状态信息 */}
           <div className="mb-8 text-center">
@@ -250,37 +199,6 @@ const Pomodoro = () => {
                 休息时间 {currentBreakTime} 分钟
               </p>
             )}
-          </div>
-
-          {/* 控制按钮 */}
-          <div className="flex space-x-4">
-            {["准备就绪", "暂停中"].includes(pomodoroStatus) ? (
-              <Button
-                onClick={startTimer}
-                variant="default"
-                size="lg"
-                className="min-w-[100px]"
-              >
-                {pomodoroStatus === "准备就绪" ? "开始" : "继续"}
-              </Button>
-            ) : (
-              <Button
-                onClick={pauseTimer}
-                variant="outline"
-                size="lg"
-                className="min-w-[100px]"
-              >
-                暂停
-              </Button>
-            )}
-            <Button
-              onClick={resetTimer}
-              variant="secondary"
-              size="lg"
-              className="min-w-[100px]"
-            >
-              重置
-            </Button>
           </div>
         </div>
       </div>
