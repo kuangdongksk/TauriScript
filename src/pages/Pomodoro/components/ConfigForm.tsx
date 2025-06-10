@@ -16,6 +16,7 @@ import {
 } from "@/store/breakStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { invoke } from "@tauri-apps/api/core";
+import { BaseDirectory, open } from "@tauri-apps/plugin-fs";
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -120,56 +121,74 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
       name: configName,
     };
 
-    try {
-      setIsLoading(true);
-      // 调用 Tauri 命令保存配置
-      await invoke(EPomodoroCommands.SAVE_CONFIG, { config: newConfig });
-      setSavedConfigs([...savedConfigs, newConfig]);
-      setConfigName("");
-      form.clearErrors();
-      toast.success("配置已保存", {
-        description: `已保存配置: ${configName}`,
+    setIsLoading(true);
+    await open("./pomodoro.json", {
+      baseDir: BaseDirectory.Config,
+      create: true,
+    })
+      .then((configFile) => {
+        configFile
+          .write(new TextEncoder().encode(JSON.stringify(newConfig)))
+          .then(() => {
+            setSavedConfigs([...savedConfigs, newConfig]);
+            setConfigName("");
+            form.clearErrors();
+            toast.success("配置已保存", {
+              description: `已保存配置: ${configName}`,
+            });
+          });
+      })
+      .catch((error) => {
+        form.setError("root", {
+          type: "manual",
+          message: "保存配置失败：" + (error as Error).message,
+        });
+        toast.error("保存配置失败", {
+          description: (error as Error).message,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-    } catch (error) {
-      form.setError("root", {
-        type: "manual",
-        message: "保存配置失败：" + (error as Error).message,
-      });
-      toast.error("保存配置失败", {
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   // 删除保存的配置
   const deleteConfig = async (
     configToDelete: PomodoroConfig & { name: string }
   ) => {
-    try {
-      setIsLoading(true);
-      // 调用 Tauri 命令删除配置
-      await invoke(EPomodoroCommands.DELETE_CONFIG, {
-        name: configToDelete.name,
+    setIsLoading(true);
+
+    await open("./pomodoro.json", {
+      baseDir: BaseDirectory.Config,
+      create: true,
+    })
+      .then((configFile) => {
+        const newConfig = savedConfigs.filter(
+          (config) => config.name !== configToDelete.name
+        );
+        configFile
+          .write(new TextEncoder().encode(JSON.stringify(newConfig)))
+          .then(() => {
+            setSavedConfigs(newConfig);
+            setConfigName("");
+            form.clearErrors();
+            toast.success("配置已删除", {
+              description: `已删除配置: ${configToDelete.name}`,
+            });
+          });
+      })
+      .catch((error) => {
+        form.setError("root", {
+          type: "manual",
+          message: "删除配置失败：" + (error as Error).message,
+        });
+        toast.error("删除配置失败", {
+          description: (error as Error).message,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-      setSavedConfigs(
-        savedConfigs.filter((config) => config.name !== configToDelete.name)
-      );
-      toast.success("配置已删除", {
-        description: `已删除配置: ${configToDelete.name}`,
-      });
-    } catch (error) {
-      form.setError("root", {
-        type: "manual",
-        message: "删除配置失败：" + (error as Error).message,
-      });
-      toast.error("删除配置失败", {
-        description: (error as Error).message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   // 加载保存的配置
