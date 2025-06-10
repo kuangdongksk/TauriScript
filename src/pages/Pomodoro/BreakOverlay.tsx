@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useEffect, useState } from "react";
+import { EPomodoroCommands } from "./constant/enum";
 
 dayjs.extend(duration);
 
@@ -15,7 +16,7 @@ const BreakOverlay = () => {
   const [remainingTime, setRemainingTime] = useState(breakTime * 60); // 剩余休息时间（秒）
 
   const endBreak = useCallback(async () => {
-    await invoke("end_break");
+    await invoke(EPomodoroCommands.END_BREAK);
     setPomodoroStatus("专注中");
   }, [setPomodoroStatus]);
 
@@ -47,7 +48,7 @@ const BreakOverlay = () => {
   const postponeBreak = async () => {
     // 增加5分钟休息时间
     const additionalTime = 5 * 60; // 5分钟转换为秒
-    setRemainingTime(prev => prev + additionalTime);
+    setRemainingTime((prev) => prev + additionalTime);
   };
 
   return (
@@ -62,7 +63,14 @@ const BreakOverlay = () => {
             style={{
               width: `${
                 breakTime > 0
-                  ? Math.max(0, Math.min(100, ((breakTime * 60 - remainingTime) / (breakTime * 60)) * 100))
+                  ? Math.max(
+                      0,
+                      Math.min(
+                        100,
+                        ((breakTime * 60 - remainingTime) / (breakTime * 60)) *
+                          100
+                      )
+                    )
                   : 0
               }%`,
             }}

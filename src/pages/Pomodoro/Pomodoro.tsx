@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
 import ConfigForm from "./components/ConfigForm";
+import { EPomodoroCommands } from "./constant/enum";
 
 export type TPomodoroStatus = "准备就绪" | "专注中" | "暂停中" | "休息中";
 
@@ -136,7 +137,7 @@ const Pomodoro = () => {
   ]);
 
   const showBreakOverlay = async () => {
-    await invoke("show_break_overlay", {
+    await invoke(EPomodoroCommands.SHOW_BREAK_OVERLAY, {
       params: {
         break_time: currentBreakTime,
       },
@@ -146,11 +147,12 @@ const Pomodoro = () => {
   // 计算进度条百分比
   const calculateProgress = () => {
     if (pomodoroStatus === "准备就绪") return 0;
-    
-    const totalTime = pomodoroStatus === "专注中" 
-      ? currentFocusTime * 60 
-      : currentBreakTime * 60;
-      
+
+    const totalTime =
+      pomodoroStatus === "专注中"
+        ? currentFocusTime * 60
+        : currentBreakTime * 60;
+
     if (totalTime === 0) return 0;
     return ((totalTime - timeLeft) / totalTime) * 100;
   };
@@ -159,7 +161,7 @@ const Pomodoro = () => {
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const progress = calculateProgress();
-  
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">
@@ -185,7 +187,7 @@ const Pomodoro = () => {
                 r={radius}
                 fill="transparent"
               ></circle>
-              
+
               {/* 进度圆环 */}
               <circle
                 className={`${
@@ -202,11 +204,13 @@ const Pomodoro = () => {
                 r={radius}
                 fill="transparent"
                 strokeDasharray={circumference}
-                strokeDashoffset={circumference - (circumference * progress) / 100}
+                strokeDashoffset={
+                  circumference - (circumference * progress) / 100
+                }
                 transform="rotate(-90 50 50)"
               ></circle>
             </svg>
-            
+
             {/* 中间的时间显示 */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-5xl font-bold text-gray-800 dark:text-white">
@@ -214,16 +218,18 @@ const Pomodoro = () => {
                   ? "--:--"
                   : dayjs.duration(timeLeft, "seconds").format("mm:ss")}
               </div>
-              <div className={`text-lg font-medium mt-2 ${
-                pomodoroStatus === "专注中"
-                  ? "text-red-500 dark:text-red-400"
-                  : pomodoroStatus === "休息中"
-                  ? "text-green-500 dark:text-green-400"
-                  : "text-gray-500 dark:text-gray-400"
-              }`}>
+              <div
+                className={`text-lg font-medium mt-2 ${
+                  pomodoroStatus === "专注中"
+                    ? "text-red-500 dark:text-red-400"
+                    : pomodoroStatus === "休息中"
+                    ? "text-green-500 dark:text-green-400"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
                 {pomodoroStatus}
               </div>
-              
+
               {pomodoroStatus !== "准备就绪" && (
                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   循环 {currentLoop}/{loopTimes}

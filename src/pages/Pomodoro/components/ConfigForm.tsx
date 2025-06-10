@@ -8,6 +8,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { EPomodoroCommands } from "@/pages/Pomodoro/constant/enum";
 import {
   BreakTimeAtom,
   FocusTimeAtom,
@@ -16,8 +17,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { invoke } from "@tauri-apps/api/core";
 import { useAtom } from "jotai";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 export interface PomodoroConfig {
@@ -34,9 +36,18 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   const [loopTimes, setLoopTimes] = useAtom(LoopTimesAtom);
 
   const formSchema = z.object({
-    focusTime: z.number().min(1).max(60), // 专注时间（分钟）
-    breakTime: z.number().min(1).max(60), // 休息时间（分钟）
-    loopTimes: z.number().min(1).max(100), // 循环次数
+    focusTime: z.coerce
+      .number()
+      .min(1, { message: "专注时间至少为1分钟" })
+      .max(120, { message: "专注时间最多为120分钟" }), // 专注时间（分钟）
+    breakTime: z.coerce
+      .number()
+      .min(1, { message: "休息时间至少为1分钟" })
+      .max(60, { message: "休息时间最多为60分钟" }), // 休息时间（分钟）
+    loopTimes: z.coerce
+      .number()
+      .min(1, { message: "循环次数至少为1次" })
+      .max(100, { message: "循环次数最多为100次" }), // 循环次数
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,17 +59,48 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
     },
   });
 
-  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
-    setFocusTime(values.focusTime);
-    setBreakTime(values.breakTime);
-    setLoopTimes(values.loopTimes);
-  }, []);
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      setFocusTime(values.focusTime);
+      setBreakTime(values.breakTime);
+      setLoopTimes(values.loopTimes);
 
-  // 保存配置
+      toast.success("设置已更新", {
+        description: `专注: ${values.focusTime}分钟, 休息: ${values.breakTime}分钟, 循环: ${values.loopTimes}次`,
+      });
+    },
+    [setFocusTime, setBreakTime, setLoopTimes]
+  );
+
+  // 状态管理
   const [savedConfigs, setSavedConfigs] = React.useState<
     Array<PomodoroConfig & { name: string }>
   >([]);
   const [configName, setConfigName] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // 加载已保存的配置列表
+  const loadSavedConfigs = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const configs = await invoke<Array<PomodoroConfig & { name: string }>>(
+        EPomodoroCommands.GET_CONFIGS
+      );
+      setSavedConfigs(configs || []);
+    } catch (error) {
+      console.error("Failed to load saved configs:", error);
+      toast.error("无法加载已保存的配置", {
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // 初始加载已保存的配置
+  useEffect(() => {
+    loadSavedConfigs();
+  }, [loadSavedConfigs]);
 
   // 保存当前配置
   const saveConfig = async () => {
@@ -67,6 +109,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
         type: "manual",
         message: "请输入配置名称",
       });
+      toast.error("请输入配置名称");
       return;
     }
 
@@ -78,16 +121,25 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
     };
 
     try {
+      setIsLoading(true);
       // 调用 Tauri 命令保存配置
-      await invoke("save_pomodoro_config", { config: newConfig });
+      await invoke(EPomodoroCommands.SAVE_CONFIG, { config: newConfig });
       setSavedConfigs([...savedConfigs, newConfig]);
       setConfigName("");
       form.clearErrors();
+      toast.success("配置已保存", {
+        description: `已保存配置: ${configName}`,
+      });
     } catch (error) {
       form.setError("root", {
         type: "manual",
         message: "保存配置失败：" + (error as Error).message,
       });
+      toast.error("保存配置失败", {
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,24 +148,53 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
     configToDelete: PomodoroConfig & { name: string }
   ) => {
     try {
+      setIsLoading(true);
       // 调用 Tauri 命令删除配置
-      await invoke("delete_pomodoro_config", { name: configToDelete.name });
+      await invoke(EPomodoroCommands.DELETE_CONFIG, {
+        name: configToDelete.name,
+      });
       setSavedConfigs(
         savedConfigs.filter((config) => config.name !== configToDelete.name)
       );
+      toast.success("配置已删除", {
+        description: `已删除配置: ${configToDelete.name}`,
+      });
     } catch (error) {
       form.setError("root", {
         type: "manual",
         message: "删除配置失败：" + (error as Error).message,
       });
+      toast.error("删除配置失败", {
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // 加载保存的配置
   const loadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
-    setFocusTime(savedConfig.focusTime);
-    setBreakTime(savedConfig.breakTime);
-    setLoopTimes(savedConfig.loopTimes);
+    try {
+      setIsLoading(true);
+      setFocusTime(savedConfig.focusTime);
+      setBreakTime(savedConfig.breakTime);
+      setLoopTimes(savedConfig.loopTimes);
+      form.reset({
+        focusTime: savedConfig.focusTime,
+        breakTime: savedConfig.breakTime,
+        loopTimes: savedConfig.loopTimes,
+      });
+      toast.success("配置已加载", {
+        description: `已加载配置: ${savedConfig.name}`,
+      });
+    } catch (error) {
+      console.error("Failed to load config:", error);
+      toast.error("加载配置失败", {
+        description: (error as Error).message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -163,37 +244,80 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
               </FormItem>
             )}
           />
-          <Button type="submit">应用</Button>
+          <Button
+            type="submit"
+            disabled={isLoading || form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "应用中..." : "应用"}
+          </Button>
         </form>
       </Form>
 
-      {/* 已保存的配置 */}
-      {savedConfigs.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
-            已保存的配置
-          </h3>
-          <div className="space-y-2">
-            {savedConfigs.map((saved, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded"
-              >
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {saved.name} ({saved.focusTime}分钟专注 / {saved.breakTime}
-                  分钟休息 x {loopTimes}循环)
-                </span>
-                <button
-                  onClick={() => loadConfig(saved)}
-                  className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
-                >
-                  加载
-                </button>
-              </div>
-            ))}
-          </div>
+      {/* 保存配置区域 */}
+      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex gap-2 mb-6">
+          <Input
+            placeholder="输入配置名称"
+            value={configName}
+            onChange={(e) => setConfigName(e.target.value)}
+            className="max-w-[200px]"
+          />
+          <Button onClick={saveConfig} variant="outline" disabled={isLoading}>
+            {isLoading ? "保存中..." : "保存配置"}
+          </Button>
         </div>
-      )}
+
+        {/* 已保存的配置列表 */}
+        {savedConfigs.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              已保存的配置
+            </h3>
+            <div className="space-y-3">
+              {savedConfigs.map((saved, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                      {saved.name}
+                    </h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {saved.focusTime}分钟专注 / {saved.breakTime}分钟休息 ×{" "}
+                      {saved.loopTimes}循环
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => loadConfig(saved)}
+                      variant="secondary"
+                      size="sm"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "加载中..." : "加载"}
+                    </Button>
+                    <Button
+                      onClick={() => deleteConfig(saved)}
+                      variant="destructive"
+                      size="sm"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "删除中..." : "删除"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {form.formState.errors.root && (
+          <p className="mt-2 text-sm text-red-500">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
