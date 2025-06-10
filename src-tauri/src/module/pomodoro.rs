@@ -1,17 +1,117 @@
 use serde::{ Deserialize, Serialize };
 use std::sync::Mutex;
-use tauri::{ Emitter, Manager, WebviewWindow };
+use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
+use tauri::{ Emitter, Manager, WebviewWindow, AppHandle };
 
 // 保存当前活动的休息窗口
 pub struct BreakState(pub Mutex<Option<WebviewWindow>>);
+
+// 番茄钟配置
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct PomodoroConfig {
+    pub name: String,
+    pub focus_time: u32,
+    pub break_time: u32,
+    pub loop_times: u32,
+}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BreakParams {
     pub break_time: u32, // 休息时间（分钟）
 }
 
+// 获取配置文件路径
+fn get_config_path(app_handle: &AppHandle) -> PathBuf {
+    let app_dir = app_handle
+        .path_resolver()
+        .app_data_dir()
+        .expect("Failed to get app data directory");
+    
+    // 确保目录存在
+    fs::create_dir_all(&app_dir).expect("Failed to create app data directory");
+    
+    app_dir.join("pomodoro_configs.json")
+}
+
+// 读取所有保存的配置
+fn read_configs(app_handle: &AppHandle) -> HashMap<String, PomodoroConfig> {
+    let config_path = get_config_path(app_handle);
+    
+    if !config_path.exists() {
+        return HashMap::new();
+    }
+    
+    match fs::read_to_string(&config_path) {
+        Ok(content) => {
+            match serde_json::from_str(&content) {
+                Ok(configs) => configs,
+                Err(e) => {
+                    eprintln!("Failed to parse config file: {}", e);
+                    HashMap::new()
+                }
+            }
+        },
+        Err(e) => {
+            eprintln!("Failed to read config file: {}", e);
+            HashMap::new()
+        }
+    }
+}
+
+// 写入配置到文件
+fn write_configs(app_handle: &AppHandle, configs: &HashMap<String, PomodoroConfig>) -> Result<(), String> {
+    let config_path = get_config_path(app_handle);
+    
+    let json = serde_json::to_string_pretty(configs)
+        .map_err(|e| format!("Failed to serialize configs: {}", e))?;
+    
+    fs::write(&config_path, json)
+        .map_err(|e| format!("Failed to write config file: {}", e))?;
+    
+    Ok(())
+}
+
+// 获取所有保存的番茄钟配置
+#[tauri::command(rename = "Pomodoro_getPomodoroConfigs")]
+pub async fn get_pomodoro_configs(app_handle: AppHandle) -> Result<Vec<PomodoroConfig>, String> {
+    let configs = read_configs(&app_handle);
+    let config_list: Vec<PomodoroConfig> = configs.values().cloned().collect();
+    Ok(config_list)
+}
+
+// 保存番茄钟配置
+#[tauri::command(rename = "Pomodoro_savePomodoroConfig")]
+pub async fn save_pomodoro_config(app_handle: AppHandle, config: PomodoroConfig) -> Result<(), String> {
+    let mut configs = read_configs(&app_handle);
+    
+    // 添加或更新配置
+    configs.insert(config.name.clone(), config);
+    
+    // 写入到文件
+    write_configs(&app_handle, &configs)
+}
+
+// 删除番茄钟配置
+#[tauri::command(rename = "Pomodoro_deletePomodoroConfig")]
+pub async fn delete_pomodoro_config(app_handle: AppHandle, name: String) -> Result<(), String> {
+    let mut configs = read_configs(&app_handle);
+    
+    // 检查配置是否存在
+    if !configs.contains_key(&name) {
+        return Err(format!("配置 '{}' 不存在", name));
+    }
+    
+    // 删除配置
+    configs.remove(&name);
+    
+    // 写入到文件
+    write_configs(&app_handle, &configs)
+}
+
 // 显示休息提醒蒙层
-#[tauri::command]
+#[tauri::command(rename = "Pomodoro_showBreakOverlay")]
 pub async fn show_break_overlay(
     window: WebviewWindow,
     app_handle: tauri::AppHandle,
@@ -55,7 +155,7 @@ pub async fn show_break_overlay(
 }
 
 // 结束休息
-#[tauri::command]
+#[tauri::command(rename = "Pomodoro_endBreak")]
 pub async fn end_break(
     app_handle: tauri::AppHandle,
     break_state: tauri::State<'_, BreakState>
@@ -74,7 +174,7 @@ pub async fn end_break(
 }
 
 // 延长休息时间
-#[tauri::command]
+#[tauri::command(rename = "Pomodoro_postponeBreak")]
 pub async fn postpone_break(
     break_state: tauri::State<'_, BreakState>,
     minutes: u32

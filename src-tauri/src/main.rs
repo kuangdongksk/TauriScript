@@ -2,7 +2,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod module;
-use module::pomodoro::{end_break, postpone_break, show_break_overlay, BreakState};
+use module::pomodoro::{
+    end_break, 
+    postpone_break, 
+    show_break_overlay, 
+    get_pomodoro_configs,
+    save_pomodoro_config,
+    delete_pomodoro_config,
+    BreakState
+};
 use module::tray::create_tray;
 use tauri_plugin_autostart::{init, MacosLauncher};
 
@@ -25,7 +33,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             show_break_overlay,
             end_break,
-            postpone_break
+            postpone_break,
+            get_pomodoro_configs,
+            save_pomodoro_config,
+            delete_pomodoro_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
