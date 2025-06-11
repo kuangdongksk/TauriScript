@@ -3,7 +3,7 @@
  */
 export enum EPomodoroCommands {
   // 休息提醒相关命令
-  SHOW_BREAK_OVERLAY = "pomodoro_showBreakOverlay",
-  END_BREAK = "pomodoro_endBreak",
-  POSTPONE_BREAK = "pomodoro_postponeBreak",
+  SHOW_BREAK_OVERLAY = "pomodoro_show_break_overlay",
+  END_BREAK = "pomodoro_end_break",
+  POSTPONE_BREAK = "pomodoro_postpone_break",
 }
