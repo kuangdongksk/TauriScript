@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useInterval } from "ahooks";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { TimerProps } from "./types";
@@ -36,36 +37,19 @@ const Timer = ({
   }, [initialTime, status]);
 
   // 处理计时器逻辑
-  useEffect(() => {
-    let interval: number | undefined;
-
+  useInterval(() => {
     if (status === "running") {
       if (timeLeft > 0) {
-        interval = window.setInterval(() => {
-          setTimeLeft((prevTime) => {
-            // 确保时间不会变成负数
-            const newTime = Math.max(0, prevTime - 1);
-
-            // 通知父组件时间变化
-            onTimeChange?.(newTime);
-
-            // 当时间到达0时，触发完成回调
-            if (newTime === 0) {
-              setTimeout(() => {
-                onComplete?.();
-              }, 0);
-            }
-
-            return newTime;
-          });
-        }, 1000);
+        // 当时间到达0时，触发完成回调
+        if (timeLeft - 1 === 0) {
+          onComplete?.();
+        } else {
+          setTimeLeft((prevTime) => prevTime - 1);
+          onTimeChange?.(timeLeft - 1);
+        }
       }
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [status, timeLeft, onComplete, onTimeChange]);
+  }, 1000);
 
   // 计算进度条百分比
   const calculateProgress = () => {

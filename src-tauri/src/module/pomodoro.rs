@@ -3,6 +3,7 @@ use std::sync::Mutex;
 use tauri::{ Emitter, Manager, WebviewWindow };
 
 // 保存当前活动的休息窗口
+#[derive(Debug)]
 pub struct BreakState(pub Mutex<Option<WebviewWindow>>);
 
 // 番茄钟配置
