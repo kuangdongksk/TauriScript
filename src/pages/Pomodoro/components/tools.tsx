@@ -119,45 +119,6 @@ export const deleteConfig = async ({
     });
 };
 
-// 加载保存的配置
-export const loadConfig = ({
-  savedConfig,
-  setFocusTime,
-  setBreakTime,
-  setLoopTimes,
-  setIsLoading,
-  form,
-}: {
-  savedConfig: PomodoroConfig & { name: string };
-  setFocusTime: (value: number) => void;
-  setBreakTime: (value: number) => void;
-  setLoopTimes: (value: number) => void;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  form: UseFormReturn<any>;
-}) => {
-  try {
-    setIsLoading(true);
-    setFocusTime(savedConfig.focusTime);
-    setBreakTime(savedConfig.breakTime);
-    setLoopTimes(savedConfig.loopTimes);
-    form.reset({
-      focusTime: savedConfig.focusTime,
-      breakTime: savedConfig.breakTime,
-      loopTimes: savedConfig.loopTimes,
-    });
-    toast.success("配置已加载", {
-      description: `已加载配置: ${savedConfig.name}`,
-    });
-  } catch (error) {
-    console.error("加载配置失败:", error);
-    toast.error("加载配置失败", {
-      description: (error as Error).message,
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
 // 加载已保存的配置列表
 export const loadSavedConfigs = async ({
   setSavedConfigs,

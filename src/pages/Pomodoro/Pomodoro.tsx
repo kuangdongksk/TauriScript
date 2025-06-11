@@ -140,25 +140,19 @@ const Pomodoro = () => {
     // 使用React 18的自动批处理功能
     if (pomodoroStatus === "专注中") {
       // 专注时间结束，显示休息提醒
-      Promise.resolve().then(() => {
-        showBreakOverlay();
-        setPomodoroStatus("休息中");
-        setTimeLeft(currentBreakTime * 60);
-      });
+      showBreakOverlay();
+      setPomodoroStatus("休息中");
+      setTimeLeft(currentBreakTime * 60);
     } else if (pomodoroStatus === "休息中") {
       // 休息时间结束
       if (currentLoop < loopTimes) {
         // 还有循环，继续专注
-        Promise.resolve().then(() => {
-          setCurrentLoop((prev) => prev + 1);
-          setPomodoroStatus("专注中");
-          setTimeLeft(currentFocusTime * 60);
-        });
+        setCurrentLoop((prev) => prev + 1);
+        setPomodoroStatus("专注中");
+        setTimeLeft(currentFocusTime * 60);
       } else {
         // 所有循环完成
-        Promise.resolve().then(() => {
-          resetTimer();
-        });
+        resetTimer();
       }
     }
   };

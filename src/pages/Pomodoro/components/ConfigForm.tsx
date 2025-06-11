@@ -10,21 +10,19 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   BreakTimeAtom,
+  currentBreakAtom,
+  currentFocusAtom,
+  currentLoopAtom,
   FocusTimeAtom,
   LoopTimesAtom,
 } from "@/store/breakStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  deleteConfig,
-  loadConfig,
-  loadSavedConfigs,
-  saveConfig,
-} from "./tools";
+import { deleteConfig, loadSavedConfigs, saveConfig } from "./tools";
 
 export interface PomodoroConfig {
   focusTime: number; // 专注时间（分钟）
@@ -35,9 +33,12 @@ export interface PomodoroConfig {
 interface ConfigFormProps {}
 
 const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
-  const [breakTime, setBreakTime] = useAtom(BreakTimeAtom);
-  const [focusTime, setFocusTime] = useAtom(FocusTimeAtom);
-  const [loopTimes, setLoopTimes] = useAtom(LoopTimesAtom);
+  const [breakTime] = useAtom(BreakTimeAtom);
+  const [focusTime] = useAtom(FocusTimeAtom);
+  const [loopTimes] = useAtom(LoopTimesAtom);
+  const setCurrentBreakTime = useSetAtom(currentBreakAtom);
+  const setCurrentFocusTime = useSetAtom(currentFocusAtom);
+  const setCurrentLoopTimes = useSetAtom(currentLoopAtom);
 
   const formSchema = z.object({
     focusTime: z.coerce
@@ -65,15 +66,16 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
-      setFocusTime(values.focusTime);
-      setBreakTime(values.breakTime);
-      setLoopTimes(values.loopTimes);
+      const { focusTime, breakTime, loopTimes } = values;
+      setCurrentFocusTime(focusTime);
+      setCurrentBreakTime(breakTime);
+      setCurrentLoopTimes(loopTimes);
 
       toast.success("设置已更新", {
-        description: `专注: ${values.focusTime}分钟, 休息: ${values.breakTime}分钟, 循环: ${values.loopTimes}次`,
+        description: `专注: ${focusTime}分钟, 休息: ${breakTime}分钟, 循环: ${loopTimes}次`,
       });
     },
-    [setFocusTime, setBreakTime, setLoopTimes]
+    [setCurrentBreakTime, setCurrentFocusTime, setCurrentLoopTimes]
   );
 
   // 状态管理
@@ -119,13 +121,16 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
 
   // 加载配置的处理函数
   const handleLoadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
-    loadConfig({
-      savedConfig,
-      setFocusTime,
-      setBreakTime,
-      setLoopTimes,
-      setIsLoading,
-      form,
+    setCurrentFocusTime(savedConfig.focusTime);
+    setCurrentBreakTime(savedConfig.breakTime);
+    setCurrentLoopTimes(savedConfig.loopTimes);
+    form.reset({
+      focusTime: savedConfig.focusTime,
+      breakTime: savedConfig.breakTime,
+      loopTimes: savedConfig.loopTimes,
+    });
+    toast.success("配置已加载", {
+      description: `已加载配置: ${savedConfig.name}`,
     });
   };
 
