@@ -94,9 +94,6 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   const handleSaveConfig = async () => {
     await saveConfig({
       configName,
-      focusTime,
-      breakTime,
-      loopTimes,
       savedConfigs,
       setSavedConfigs,
       setConfigName,

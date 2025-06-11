@@ -6,9 +6,6 @@ import { PomodoroConfig } from "./ConfigForm";
 // 保存当前配置
 export const saveConfig = async ({
   configName,
-  focusTime,
-  breakTime,
-  loopTimes,
   savedConfigs,
   setSavedConfigs,
   setConfigName,
@@ -16,9 +13,6 @@ export const saveConfig = async ({
   form,
 }: {
   configName: string;
-  focusTime: number;
-  breakTime: number;
-  loopTimes: number;
   savedConfigs: Array<PomodoroConfig & { name: string }>;
   setSavedConfigs: React.Dispatch<
     React.SetStateAction<Array<PomodoroConfig & { name: string }>>
@@ -36,12 +30,8 @@ export const saveConfig = async ({
     return;
   }
 
-  const newConfig = {
-    focusTime,
-    breakTime,
-    loopTimes,
-    name: configName,
-  };
+  const newConfig = form.getValues();
+  newConfig.name = configName;
 
   setIsLoading(true);
   writeTextFile("pomodoro.json", JSON.stringify([...savedConfigs, newConfig]), {

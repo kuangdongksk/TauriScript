@@ -22,6 +22,7 @@ const Timer = ({
   className = "",
 }: TimerProps) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
+  console.log("🚀 ~ initialTime:", initialTime)
 
   // 重置计时器
   const resetTimer = () => {
@@ -31,9 +32,7 @@ const Timer = ({
 
   // 当初始时间变化时更新计时器
   useEffect(() => {
-    if (status === "ready") {
-      setTimeLeft(initialTime);
-    }
+    setTimeLeft(initialTime);
   }, [initialTime, status]);
 
   // 处理计时器逻辑
@@ -61,15 +60,6 @@ const Timer = ({
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const progress = calculateProgress();
-
-  // 处理按钮点击
-  const handleStartClick = () => {
-    onStatusChange?.("running");
-  };
-
-  const handlePauseClick = () => {
-    onStatusChange?.("paused");
-  };
 
   const handleResetClick = () => {
     resetTimer();
@@ -126,7 +116,7 @@ const Timer = ({
         <div className="flex space-x-4">
           {status === "ready" || status === "paused" ? (
             <Button
-              onClick={handleStartClick}
+              onClick={() => onStatusChange?.("running")}
               variant="default"
               size="lg"
               className="min-w-[100px]"
@@ -135,7 +125,7 @@ const Timer = ({
             </Button>
           ) : (
             <Button
-              onClick={handlePauseClick}
+              onClick={() => onStatusChange?.("paused")}
               variant="outline"
               size="lg"
               className="min-w-[100px]"
