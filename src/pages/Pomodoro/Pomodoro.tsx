@@ -1,43 +1,39 @@
 import { Timer, TimerStatus } from "@/components/Timer";
 import {
-  BreakTimeAtom,
-  currentBreakAtom,
-  currentFocusAtom,
-  currentLoopAtom,
-  FocusTimeAtom,
-  LoopTimesAtom,
-  PomodoroStatusAtom,
+  BreakTimeA,
+  FocusTimeA,
+  CurrentLoopA,
+  LoopTimesA,
+  PomodoroStatusA,
 } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import { useAtom, useAtomValue } from "jotai";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import ConfigForm from "./components/ConfigForm";
 import { EPomodoroCommands } from "./constant/enum";
 
 export type TPomodoroStatus = "准备就绪" | "专注中" | "暂停中" | "休息中";
 
 const Pomodoro = () => {
-  const breakTime = useAtomValue(BreakTimeAtom);
-  const focusTime = useAtomValue(FocusTimeAtom);
-  const loopTimes = useAtomValue(LoopTimesAtom);
-
-  const [currentFocusTime, setCurrentFocusTime] = useAtom(currentFocusAtom);
-  const [currentBreakTime, setCurrentBreakTime] = useAtom(currentBreakAtom);
-  const [currentLoop, setCurrentLoop] = useAtom(currentLoopAtom);
+  const focusTime = useAtomValue(FocusTimeA);
+  const breakTime = useAtomValue(BreakTimeA);
+  const loopTimes = useAtomValue(LoopTimesA);
+  const [currentLoop, setCurrentLoop] = useAtom(CurrentLoopA);
   const [pomodoroStatus, setPomodoroStatus] =
-    useAtom<TPomodoroStatus>(PomodoroStatusAtom);
+    useAtom<TPomodoroStatus>(PomodoroStatusA);
 
   // 计时器状态
   const timerRef = useRef<{
     setTimeLeft: Dispatch<SetStateAction<number>>;
   } | null>(null);
   const preStateRef = useRef(pomodoroStatus);
+  const [timerVersion, setTimerVersion] = useState(0);
 
   // 显示休息提醒
   const showBreakOverlay = async () => {
     await invoke(EPomodoroCommands.SHOW_BREAK_OVERLAY, {
       params: {
-        break_time: currentBreakTime,
+        break_time: breakTime,
       },
     });
   };
@@ -68,9 +64,6 @@ const Pomodoro = () => {
   const resetTimer = () => {
     setPomodoroStatus("准备就绪");
     setCurrentLoop(0);
-    // 重置为当前设置的时间
-    setCurrentBreakTime(breakTime);
-    setCurrentFocusTime(focusTime);
   };
 
   // 将番茄钟状态映射到Timer组件状态
@@ -92,9 +85,7 @@ const Pomodoro = () => {
 
   // 获取当前阶段的总时间（秒）
   const getCurrentPhaseTime = () => {
-    return pomodoroStatus === "休息中"
-      ? currentBreakTime * 60
-      : currentFocusTime * 60;
+    return pomodoroStatus === "休息中" ? breakTime * 60 : focusTime * 60;
   };
 
   // 获取当前进度条颜色
@@ -126,19 +117,18 @@ const Pomodoro = () => {
 
   // 处理Timer组件的完成事件
   const onComplete = () => {
+    setTimerVersion((prev) => prev + 1);
     // 使用React 18的自动批处理功能
     if (pomodoroStatus === "专注中") {
       // 专注时间结束，显示休息提醒
       showBreakOverlay();
       setPomodoroStatus("休息中");
-      timerRef.current?.setTimeLeft(getCurrentPhaseTime());
     } else if (pomodoroStatus === "休息中") {
       // 休息时间结束
       if (currentLoop < loopTimes) {
         // 还有循环，继续专注
         setCurrentLoop((prev) => prev + 1);
         setPomodoroStatus("专注中");
-        timerRef.current?.setTimeLeft(getCurrentPhaseTime());
       } else {
         // 所有循环完成
         resetTimer();
@@ -162,6 +152,8 @@ const Pomodoro = () => {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
           <Timer
             status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
+            version={timerVersion}
+            initialTime={getCurrentPhaseTime()}
             progressColor={getProgressColor()}
             label={pomodoroStatus}
             subLabel={
@@ -180,12 +172,12 @@ const Pomodoro = () => {
           <div className="mb-8 text-center">
             {pomodoroStatus === "专注中" && (
               <p className="text-gray-600 dark:text-gray-300">
-                专注时间 {currentFocusTime} 分钟
+                专注时间 {focusTime} 分钟
               </p>
             )}
             {pomodoroStatus === "休息中" && (
               <p className="text-gray-600 dark:text-gray-300">
-                休息时间 {currentBreakTime} 分钟
+                休息时间 {breakTime} 分钟
               </p>
             )}
           </div>

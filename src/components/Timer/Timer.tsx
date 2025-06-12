@@ -5,22 +5,25 @@ import { useEffect, useImperativeHandle, useState } from "react";
 import { TimerProps } from "./types";
 
 const Timer = ({
-  initialTime = 0,
   status,
-  progressColor = "text-blue-500 dark:text-blue-400",
+  version,
+  //
   backgroundColor = "text-gray-200 dark:text-gray-700",
+  className = "",
+  initialTime = 0,
   label,
   pauseButtonText = "暂停",
+  progressColor = "text-blue-500 dark:text-blue-400",
   resetButtonText = "重置",
   subLabel,
   showControls = true,
   startButtonText = "开始",
   timerRef,
+  //
   onComplete,
   onStatusChange,
   onTimeChange,
   onReset,
-  className = "",
 }: TimerProps) => {
   // 计算圆形进度条的周长
   const radius = 45;
@@ -31,7 +34,7 @@ const Timer = ({
   // 当初始时间变化时更新计时器
   useEffect(() => {
     setTimeLeft(initialTime);
-  }, [initialTime, status]);
+  }, [initialTime, version]);
 
   // 处理计时器逻辑
   useInterval(() => {

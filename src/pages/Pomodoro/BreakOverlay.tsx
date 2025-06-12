@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BreakTimeAtom, PomodoroStatusAtom } from "@/store/breakStore";
+import { BreakTimeA, PomodoroStatusA } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -10,8 +10,8 @@ import { EPomodoroCommands } from "./constant/enum";
 dayjs.extend(duration);
 
 const BreakOverlay = () => {
-  const breakTime = useAtomValue(BreakTimeAtom);
-  const [, setPomodoroStatus] = useAtom(PomodoroStatusAtom);
+  const breakTime = useAtomValue(BreakTimeA);
+  const [, setPomodoroStatus] = useAtom(PomodoroStatusA);
 
   const [remainingTime, setRemainingTime] = useState(breakTime * 60); // 剩余休息时间（秒）
 

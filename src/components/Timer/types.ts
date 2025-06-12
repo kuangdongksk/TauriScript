@@ -2,9 +2,14 @@ export type TimerStatus = "ready" | "running" | "paused";
 
 export interface TimerProps {
   /**
-   * 计时器状态
+   * @description 计时器状态
    */
   status: TimerStatus;
+  /**
+   * @name 版本
+   * @description 防止因为initialTime一样导致计时器无法更新
+   */
+  version?: number;
 
   /**
    * 背景颜色
@@ -47,9 +52,11 @@ export interface TimerProps {
    */
   startButtonText?: string;
   /**
-   * ref
+   * @name ref
+   * @description
    */
   timerRef?: React.Ref<{ setTimeLeft: React.Dispatch<React.SetStateAction<number>> }>;
+
 
   /**
    * 计时完成回调
