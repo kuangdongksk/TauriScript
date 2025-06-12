@@ -1,34 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { useInterval } from "ahooks";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useImperativeHandle, useState } from "react";
 import { TimerProps } from "./types";
 
 const Timer = ({
-  initialTime,
+  initialTime = 0,
   status,
   progressColor = "text-blue-500 dark:text-blue-400",
   backgroundColor = "text-gray-200 dark:text-gray-700",
   label,
+  pauseButtonText = "暂停",
+  resetButtonText = "重置",
   subLabel,
   showControls = true,
   startButtonText = "开始",
-  pauseButtonText = "暂停",
-  resetButtonText = "重置",
+  timerRef,
   onComplete,
   onStatusChange,
   onTimeChange,
   onReset,
   className = "",
 }: TimerProps) => {
-  const [timeLeft, setTimeLeft] = useState(initialTime);
-  console.log("🚀 ~ initialTime:", initialTime)
+  // 计算圆形进度条的周长
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
 
-  // 重置计时器
-  const resetTimer = () => {
-    setTimeLeft(initialTime);
-    onReset?.();
-  };
+  const [timeLeft, setTimeLeft] = useState(initialTime);
 
   // 当初始时间变化时更新计时器
   useEffect(() => {
@@ -50,19 +48,22 @@ const Timer = ({
     }
   }, 1000);
 
+  useImperativeHandle(timerRef, () => {
+    return {
+      setTimeLeft,
+    };
+  });
+
   // 计算进度条百分比
   const calculateProgress = () => {
     if (status === "ready" || initialTime === 0) return 0;
     return ((initialTime - timeLeft) / initialTime) * 100;
   };
 
-  // 计算圆形进度条的周长
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const progress = calculateProgress();
-
+  // 重置计时器
   const handleResetClick = () => {
-    resetTimer();
+    setTimeLeft(initialTime);
+    onReset?.();
     onStatusChange?.("ready");
   };
 
@@ -90,7 +91,9 @@ const Timer = ({
             r={radius}
             fill="transparent"
             strokeDasharray={circumference}
-            strokeDashoffset={circumference - (circumference * progress) / 100}
+            strokeDashoffset={
+              circumference - (circumference * calculateProgress()) / 100
+            }
             transform="rotate(-90 50 50)"
           ></circle>
         </svg>

@@ -10,7 +10,7 @@ import {
 } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import { useAtom, useAtomValue } from "jotai";
-import { useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
 import ConfigForm from "./components/ConfigForm";
 import { EPomodoroCommands } from "./constant/enum";
 
@@ -28,6 +28,9 @@ const Pomodoro = () => {
     useAtom<TPomodoroStatus>(PomodoroStatusAtom);
 
   // 计时器状态
+  const timerRef = useRef<{
+    setTimeLeft: Dispatch<SetStateAction<number>>;
+  } | null>(null);
   const preStateRef = useRef(pomodoroStatus);
 
   // 显示休息提醒
@@ -122,18 +125,20 @@ const Pomodoro = () => {
   };
 
   // 处理Timer组件的完成事件
-  const handleComplete = () => {
+  const onComplete = () => {
     // 使用React 18的自动批处理功能
     if (pomodoroStatus === "专注中") {
       // 专注时间结束，显示休息提醒
       showBreakOverlay();
       setPomodoroStatus("休息中");
+      timerRef.current?.setTimeLeft(getCurrentPhaseTime());
     } else if (pomodoroStatus === "休息中") {
       // 休息时间结束
       if (currentLoop < loopTimes) {
         // 还有循环，继续专注
         setCurrentLoop((prev) => prev + 1);
         setPomodoroStatus("专注中");
+        timerRef.current?.setTimeLeft(getCurrentPhaseTime());
       } else {
         // 所有循环完成
         resetTimer();
@@ -156,7 +161,6 @@ const Pomodoro = () => {
         {/* 番茄钟计时器 */}
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
           <Timer
-            initialTime={getCurrentPhaseTime()}
             status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
             progressColor={getProgressColor()}
             label={pomodoroStatus}
@@ -165,8 +169,9 @@ const Pomodoro = () => {
                 ? `循环 ${currentLoop}/${loopTimes}`
                 : undefined
             }
+            timerRef={timerRef}
             onStatusChange={handleStatusChange}
-            onComplete={handleComplete}
+            onComplete={onComplete}
             onReset={resetTimer}
             className="mb-8"
           />
