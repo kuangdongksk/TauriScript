@@ -1,0 +1,18 @@
+{
+  "identifier": "BreakOverlay",
+  "description": "休息窗口的权限",
+  "windows": ["break_overlay"],
+  "webview": ["break_overlay"],
+  "remote": {
+    "urls": ["http://localhost:1420/"]
+  },
+  "local": true,
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "notification:default",
+    "sql:default",
+    "store:default",
+    "upload:default"
+  ]
+}

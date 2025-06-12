@@ -1,25 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { BreakTimeA, PomodoroStatusA } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
-import { useInterval } from "ahooks";
+import { listen } from "@tauri-apps/api/event";
+import { useInterval, useUnmount } from "ahooks";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { EPomodoroCommands } from "./constant/enum";
 
 dayjs.extend(duration);
 
 const BreakOverlay = () => {
-  const breakTime = useAtomValue(BreakTimeA);
-  const [, setPomodoroStatus] = useAtom(PomodoroStatusA);
+  const [breakTime, setBreakTime] = useAtom(BreakTimeA);
+  const setPomodoroStatus = useSetAtom(PomodoroStatusA);
 
   const [remainingTime, setRemainingTime] = useState(breakTime * 60); // 剩余休息时间（秒）
 
-  const endBreak = useCallback(async () => {
-    await invoke(EPomodoroCommands.END_BREAK);
-    setPomodoroStatus("专注中");
-  }, [setPomodoroStatus]);
+  const unListen = useCallback(async () => {
+    return await listen<number>("showBreakOverlay", (event) => {
+      console.log("🚀 ~ unListen ~ event:", event);
+
+      setBreakTime(event.payload);
+    });
+  }, []);
+
+  useUnmount(() => unListen());
 
   useEffect(() => {
     setRemainingTime(breakTime * 60);
@@ -33,11 +39,10 @@ const BreakOverlay = () => {
     setRemainingTime((prev) => prev - 1);
   }, 1000);
 
-  const postponeBreak = async () => {
-    // 增加5分钟休息时间
-    const additionalTime = 5 * 60; // 5分钟转换为秒
-    setRemainingTime((prev) => prev + additionalTime);
-  };
+  const endBreak = useCallback(async () => {
+    await invoke(EPomodoroCommands.END_BREAK);
+    setPomodoroStatus("专注中");
+  }, [setPomodoroStatus]);
 
   return (
     <div className="w-full h-full fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -71,11 +76,13 @@ const BreakOverlay = () => {
 
         <div className="flex space-x-4 justify-center">
           <Button
-            onClick={postponeBreak}
+            onClick={() => {
+              endBreak();
+            }}
             variant="outline"
             className="min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white border-gray-500"
           >
-            +5分钟
+            5分钟后休息
           </Button>
           <Button
             onClick={endBreak}

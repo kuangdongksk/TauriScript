@@ -1,14 +1,15 @@
 import { Timer, TimerStatus } from "@/components/Timer";
 import {
   BreakTimeA,
-  FocusTimeA,
   CurrentLoopA,
+  FocusTimeA,
   LoopTimesA,
   PomodoroStatusA,
 } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
+import { emit } from "@tauri-apps/api/event";
 import { useAtom, useAtomValue } from "jotai";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ConfigForm from "./components/ConfigForm";
 import { EPomodoroCommands } from "./constant/enum";
 
@@ -29,6 +30,12 @@ const Pomodoro = () => {
   const preStateRef = useRef(pomodoroStatus);
   const [timerVersion, setTimerVersion] = useState(0);
 
+  useEffect(() => {
+    if (preStateRef.current === "休息中" && pomodoroStatus === "专注中") {
+      setCurrentLoop((prev) => prev + 1);
+    }
+  }, [pomodoroStatus]);
+
   // 显示休息提醒
   const showBreakOverlay = async () => {
     await invoke(EPomodoroCommands.SHOW_BREAK_OVERLAY, {
@@ -36,6 +43,7 @@ const Pomodoro = () => {
         break_time: breakTime,
       },
     });
+    await emit("showBreakOverlay", { breakTime });
   };
 
   // 开始番茄钟
