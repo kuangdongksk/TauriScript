@@ -104,16 +104,13 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
 
   // 加载配置的处理函数
   const handleLoadConfig = (savedConfig: PomodoroConfig & { name: string }) => {
-    setFocusTime(savedConfig.focusTime);
-    setBreakTime(savedConfig.breakTime);
-    setLoopTimes(savedConfig.loopTimes);
-    form.reset({
-      focusTime: savedConfig.focusTime,
-      breakTime: savedConfig.breakTime,
-      loopTimes: savedConfig.loopTimes,
-    });
-    toast.success("配置已加载", {
-      description: `已加载配置: ${savedConfig.name}`,
+    const { focusTime, breakTime, loopTimes } = savedConfig;
+    setFocusTime(focusTime);
+    setBreakTime(breakTime);
+    setLoopTimes(loopTimes);
+    form.reset({ focusTime, breakTime, loopTimes });
+    toast("配置已加载", {
+      description: `已加载配置: ${savedConfig.name}：专注: ${focusTime}分钟, 休息: ${breakTime}分钟, 循环: ${loopTimes}次`,
     });
   };
 

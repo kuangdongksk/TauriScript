@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { BreakTimeA, PomodoroStatusA } from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
+import { useInterval } from "ahooks";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useAtom, useAtomValue } from "jotai";
@@ -24,26 +25,13 @@ const BreakOverlay = () => {
     setRemainingTime(breakTime * 60);
   }, [breakTime]);
 
-  useEffect(() => {
-    if (remainingTime <= 0) {
-      endBreak();
-      return;
+  useInterval(() => {
+    if (remainingTime - 1 <= 0) {
+      return endBreak();
     }
 
-    const interval = setInterval(() => {
-      setRemainingTime((prev) => {
-        const next = prev <= 1 ? 0 : prev - 1;
-        if (next === 0) {
-          clearInterval(interval);
-        }
-        return next;
-      });
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [remainingTime, endBreak]);
+    setRemainingTime((prev) => prev - 1);
+  }, 1000);
 
   const postponeBreak = async () => {
     // 增加5分钟休息时间
