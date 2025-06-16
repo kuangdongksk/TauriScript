@@ -30,7 +30,7 @@
     "@tauri-apps/plugin-window": "2.0.0-alpha.1",
     "@tauri-apps/plugin-window-state": "~2.2.2",
     "ahooks": "^3.8.5",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "dayjs": "^1.11.13",
     "jotai": "^2.12.5",
@@ -40,10 +40,10 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.57.0",
+    "react-hook-form": "^7.58.0",
     "react-router-dom": "^7.6.2",
     "sonner": "^2.0.5",
-    "zod": "^3.25.63"
+    "zod": "^3.25.64"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",
