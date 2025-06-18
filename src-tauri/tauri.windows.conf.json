@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "identifier": "com.desktop-tools.dev",
   "productName": "desktop-tools",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "bundle": {
     "active": true,
     "targets": ["nsis"],
