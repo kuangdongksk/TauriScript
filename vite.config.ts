@@ -13,9 +13,12 @@ export default defineConfig(async () => ({
     rollupOptions: {
       output: {
         manualChunks: (id: string) => {
-          console.log("🚀 ~ defineConfig ~ id:", id)
 
           if (id.includes('node_modules')) {
+            if (id.includes('ahooks')) {
+              return 'vendor-framework-react-ahooks'
+            }
+
             if (id.includes('react')) {
               return 'vendor-framework-react'
             }

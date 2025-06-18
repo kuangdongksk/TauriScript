@@ -134,7 +134,10 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
       </h2>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid grid-cols-2 gap-x-3 gap-y-2"
+        >
           <FormField
             control={form.control}
             name="focusTime"
@@ -174,12 +177,24 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            disabled={isLoading || form.formState.isSubmitting}
-          >
-            {form.formState.isSubmitting ? "应用中..." : "应用"}
-          </Button>
+          <FormField
+            control={form.control}
+            name="loopTimes"
+            render={({}) => (
+              <FormItem>
+                <FormLabel>&nbsp;</FormLabel>
+                <FormControl>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || form.formState.isSubmitting}
+                  >
+                    {form.formState.isSubmitting ? "应用中..." : "应用"}
+                  </Button>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </form>
       </Form>
 
