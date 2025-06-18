@@ -1,10 +1,9 @@
-import { BaseDirectory, exists } from "@tauri-apps/plugin-fs";
+// import { BaseDirectory, exists } from "@tauri-apps/plugin-fs";
 
-class FileManager {
-  private static async exists(path: string, BaseDirectory: BaseDirectory) {
-    return await exists(path, { baseDir: BaseDirectory });
-  }
-
+export class FileManager {
+  // private static async exists(path: string, BaseDirectory: BaseDirectory) {
+  //   return await exists(path, { baseDir: BaseDirectory });
+  // }
   // static async readFile(
   //   filePath: string,
   //   config: {
@@ -18,7 +17,6 @@ class FileManager {
   //     await FileManager.writeFile(filePath, "", config);
   //     return "";
   //   }
-
   //   return null;
   // }
 }

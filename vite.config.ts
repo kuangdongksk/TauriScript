@@ -1,14 +1,29 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import jotaiDebugLabel from 'jotai/babel/plugin-debug-label';
+import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh';
 import path from "path";
-import jotaiDebugLabel from 'jotai/babel/plugin-debug-label'
-import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh'
+import { defineConfig } from "vite";
 
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          console.log("🚀 ~ defineConfig ~ id:", id)
+
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) {
+              return 'vendor-framework-react'
+            }
+          }
+        },
+      },
+    },
+  },
   plugins: [react({
     babel: {
       plugins: [jotaiDebugLabel, jotaiReactRefresh]
@@ -50,6 +65,6 @@ export default defineConfig(async () => ({
       minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
       // produce sourcemaps for debug builds
       sourcemap: !!process.env.TAURI_DEBUG,
-    },
-  },
+    }
+  }
 }));
