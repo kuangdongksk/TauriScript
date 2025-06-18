@@ -44,10 +44,16 @@ const BreakOverlay = () => {
     setRemainingTime((prev) => prev - 1);
   }, 1000);
 
-  const endBreak = useCallback(async () => {
-    await invoke(EPomodoroCommands.END_BREAK);
+  const endBreak = async () => {
     setPomodoroStatus("专注中");
-  }, [setPomodoroStatus]);
+    await invoke(EPomodoroCommands.END_BREAK);
+  };
+
+  const postponeBreak = async () => {
+    setPomodoroStatus("专注中");
+    setCurrentTimeLeft(5);
+    await invoke(EPomodoroCommands.END_BREAK);
+  };
 
   return (
     <div className="w-full h-full fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -81,10 +87,7 @@ const BreakOverlay = () => {
 
         <div className="flex space-x-4 justify-center">
           <Button
-            onClick={() => {
-              endBreak();
-              setCurrentTimeLeft(5);
-            }}
+            onClick={postponeBreak}
             variant="outline"
             className="min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white border-gray-500"
           >

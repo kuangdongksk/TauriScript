@@ -20,7 +20,7 @@ const Pomodoro = () => {
   const focusTime = useAtomValue(FocusTimeA);
   const breakTime = useAtomValue(BreakTimeA);
   const loopTimes = useAtomValue(LoopTimesA);
-  const currentTimeLeft = useAtomValue(CurrentTimeLeftA);
+  const [currentTimeLeft, setCurrentTimeLeft] = useAtom(CurrentTimeLeftA);
   const [currentLoop, setCurrentLoop] = useAtom(CurrentLoopA);
   const [pomodoroStatus, setPomodoroStatus] =
     useAtom<TPomodoroStatus>(PomodoroStatusA);
@@ -37,7 +37,10 @@ const Pomodoro = () => {
   }, [pomodoroStatus]);
 
   useEffect(() => {
-    timerRef.current?.setTimeLeft(currentTimeLeft * 60);
+    if (currentTimeLeft !== 0) {
+      timerRef.current?.setTimeLeft(currentTimeLeft * 60);
+      setCurrentTimeLeft(0);
+    }
   }, [currentTimeLeft]);
 
   // 显示休息提醒
