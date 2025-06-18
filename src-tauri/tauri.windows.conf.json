@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "identifier": "com.desktop-tools.dev",
   "productName": "desktop-tools",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "bundle": {
     "active": true,
     "targets": ["nsis"],
@@ -15,8 +15,8 @@
     ]
   },
   "build": {
-    "beforeBuildCommand": "pnpm run build",
-    "beforeDevCommand": "pnpm run dev",
+    "beforeBuildCommand": "pnpm run web:build",
+    "beforeDevCommand": "pnpm run web:dev",
 
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420/"
