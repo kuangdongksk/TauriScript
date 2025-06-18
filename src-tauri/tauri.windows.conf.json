@@ -15,8 +15,8 @@
     ]
   },
   "build": {
-    "beforeBuildCommand": "pnpm run build",
-    "beforeDevCommand": "pnpm run dev",
+    "beforeBuildCommand": "pnpm run web:build",
+    "beforeDevCommand": "pnpm run web:dev",
 
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420/"
