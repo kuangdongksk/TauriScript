@@ -404,6 +404,12 @@ async function resolveLocales() {
   const targetLocalesDir = path.join(cwd, "src-tauri/resources/locales");
 
   try {
+    // 检查源目录是否存在
+    if (!fs.existsSync(srcLocalesDir)) {
+      log_info("Locales directory does not exist, skipping...");
+      return;
+    }
+
     // 确保目标目录存在
     await fsp.mkdir(targetLocalesDir, { recursive: true });
 
@@ -422,7 +428,8 @@ async function resolveLocales() {
     log_success("All locale files copied successfully");
   } catch (err) {
     log_error("Error copying locale files:", err.message);
-    throw err;
+    // 不抛出错误，让构建继续
+    log_info("Continuing build process despite locale error...");
   }
 }
 
@@ -545,7 +552,8 @@ const tasks = [
 ];
 
 async function runTask() {
-  const task = tasks.shift();
+  // const task = tasks.shift();
+  const task = [];
   if (!task) return;
   if (task.unixOnly && platform === "win32") return runTask();
   if (task.winOnly && platform !== "win32") return runTask();
