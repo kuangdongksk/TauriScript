@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if git diff --cached --name-only | grep -q '^src-tauri/'; then
+    cargo clippy --manifest-path ./src-tauri/Cargo.toml
+    if [ $? -ne 0 ]; then
+        echo "Clippy found 问题 in src-tauri. Please fix them before pushing."
+        exit 1
+    fi
+fi
+
+exit 0
