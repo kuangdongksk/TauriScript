@@ -27,6 +27,9 @@ export default defineConfig(async () => ({
       },
     },
   },
+  define: {
+    OS_PLATFORM: `"${process.platform}"`,
+  },
   plugins: [react({
     babel: {
       plugins: [jotaiDebugLabel, jotaiReactRefresh]

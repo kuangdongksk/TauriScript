@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.11.1",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tauri build",
     "preview": "vite preview",
     "tauri": "tauri",
     "prebuild": "node scripts/prebuild.mjs",
