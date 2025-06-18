@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   BreakTimeA,
+  CurrentLoopA,
   CurrentTimeLeftA,
   PomodoroStatusA,
 } from "@/store/breakStore";
@@ -17,6 +18,7 @@ dayjs.extend(duration);
 
 const BreakOverlay = () => {
   const [breakTime, setBreakTime] = useAtom(BreakTimeA);
+  const setCurrentLoop = useSetAtom(CurrentLoopA);
   const setCurrentTimeLeft = useSetAtom(CurrentTimeLeftA);
   const setPomodoroStatus = useSetAtom(PomodoroStatusA);
 
@@ -46,6 +48,7 @@ const BreakOverlay = () => {
 
   const endBreak = async () => {
     setPomodoroStatus("专注中");
+    setCurrentLoop((prev) => prev + 1);
     await invoke(EPomodoroCommands.END_BREAK);
   };
 
