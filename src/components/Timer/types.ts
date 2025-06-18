@@ -1,5 +1,12 @@
 export type TimerStatus = "ready" | "running" | "paused";
 
+export interface ITimerRef {
+  /**
+   * @单位 秒
+   */
+  setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
+}
+
 export interface TimerProps {
   /**
    * @description 计时器状态
@@ -55,7 +62,7 @@ export interface TimerProps {
    * @name ref
    * @description
    */
-  timerRef?: React.Ref<{ setTimeLeft: React.Dispatch<React.SetStateAction<number>> }>;
+  timerRef?: React.Ref<ITimerRef>;
 
 
   /**

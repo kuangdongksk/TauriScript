@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { BreakTimeA, PomodoroStatusA } from "@/store/breakStore";
+import {
+  BreakTimeA,
+  CurrentTimeLeftA,
+  PomodoroStatusA,
+} from "@/store/breakStore";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { useInterval, useUnmount } from "ahooks";
@@ -13,6 +17,7 @@ dayjs.extend(duration);
 
 const BreakOverlay = () => {
   const [breakTime, setBreakTime] = useAtom(BreakTimeA);
+  const setCurrentTimeLeft = useSetAtom(CurrentTimeLeftA);
   const setPomodoroStatus = useSetAtom(PomodoroStatusA);
 
   const [remainingTime, setRemainingTime] = useState(breakTime * 60); // 剩余休息时间（秒）
@@ -78,6 +83,7 @@ const BreakOverlay = () => {
           <Button
             onClick={() => {
               endBreak();
+              setCurrentTimeLeft(5);
             }}
             variant="outline"
             className="min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white border-gray-500"

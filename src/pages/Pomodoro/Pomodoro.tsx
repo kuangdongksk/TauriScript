@@ -1,7 +1,8 @@
-import { Timer, TimerStatus } from "@/components/Timer";
+import { ITimerRef, Timer, TimerStatus } from "@/components/Timer";
 import {
   BreakTimeA,
   CurrentLoopA,
+  CurrentTimeLeftA,
   FocusTimeA,
   LoopTimesA,
   PomodoroStatusA,
@@ -9,7 +10,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { emit } from "@tauri-apps/api/event";
 import { useAtom, useAtomValue } from "jotai";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ConfigForm from "./components/ConfigForm";
 import { EPomodoroCommands } from "./constant/enum";
 
@@ -19,14 +20,13 @@ const Pomodoro = () => {
   const focusTime = useAtomValue(FocusTimeA);
   const breakTime = useAtomValue(BreakTimeA);
   const loopTimes = useAtomValue(LoopTimesA);
+  const currentTimeLeft = useAtomValue(CurrentTimeLeftA);
   const [currentLoop, setCurrentLoop] = useAtom(CurrentLoopA);
   const [pomodoroStatus, setPomodoroStatus] =
     useAtom<TPomodoroStatus>(PomodoroStatusA);
 
   // 计时器状态
-  const timerRef = useRef<{
-    setTimeLeft: Dispatch<SetStateAction<number>>;
-  } | null>(null);
+  const timerRef = useRef<ITimerRef | null>(null);
   const preStateRef = useRef(pomodoroStatus);
   const [timerVersion, setTimerVersion] = useState(0);
 
@@ -35,6 +35,10 @@ const Pomodoro = () => {
       setCurrentLoop((prev) => prev + 1);
     }
   }, [pomodoroStatus]);
+
+  useEffect(() => {
+    timerRef.current?.setTimeLeft(currentTimeLeft * 60);
+  }, [currentTimeLeft]);
 
   // 显示休息提醒
   const showBreakOverlay = async () => {
@@ -126,7 +130,6 @@ const Pomodoro = () => {
   // 处理Timer组件的完成事件
   const onComplete = () => {
     setTimerVersion((prev) => prev + 1);
-    // 使用React 18的自动批处理功能
     if (pomodoroStatus === "专注中") {
       // 专注时间结束，显示休息提醒
       showBreakOverlay();

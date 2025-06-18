@@ -1,3 +1,16 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -210,21 +223,44 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
                     </p>
                   </div>
                   <div className="flex gap-2">
+                    <AlertDialog>
+                      <AlertDialogTrigger>
+                        <Button
+                          className="text-red-500"
+                          variant="link"
+                          size="sm"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? "删除中..." : "删除"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogPortal>
+                        <AlertDialogOverlay />
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>确定删除</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              是否确定删除？
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>取消</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteConfig(saved)}
+                            >
+                              确定
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialogPortal>
+                    </AlertDialog>
                     <Button
                       onClick={() => handleLoadConfig(saved)}
-                      variant="secondary"
+                      variant="default"
                       size="sm"
                       disabled={isLoading}
                     >
                       {isLoading ? "加载中..." : "加载"}
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteConfig(saved)}
-                      variant="destructive"
-                      size="sm"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "删除中..." : "删除"}
                     </Button>
                   </div>
                 </div>
