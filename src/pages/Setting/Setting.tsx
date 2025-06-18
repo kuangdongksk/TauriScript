@@ -1,5 +1,6 @@
+import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { useEffect, useState } from "react";
-import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Setting = () => {
   const [autoStart, setAutoStart] = useState(false);
@@ -46,15 +47,19 @@ const Setting = () => {
         设置
       </h1>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <label className="flex items-center space-x-3 cursor-pointer">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-700 dark:text-gray-300">开机自动启动</span>
           <input
             type="checkbox"
             checked={autoStart}
             onChange={(e) => handleAutoStartChange(e.target.checked)}
             className="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
           />
-          <span className="text-gray-700 dark:text-gray-300">开机自动启动</span>
-        </label>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-700 dark:text-gray-300">主题色</span>
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );
