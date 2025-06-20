@@ -1,11 +1,3 @@
-import React from "react";
-import { useAtom } from "jotai";
-import {
-  themeAtom,
-  modeAtom,
-  toggleModeAtom,
-  getAvailableThemes,
-} from "@/store/themeAtoms";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,12 +6,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  getAvailableThemes,
+  modeAtom,
+  themeAtom,
+  toggleModeAtom,
+} from "@/store/themeAtoms";
+import { useAtom, useSetAtom } from "jotai";
 import { Moon, Sun } from "lucide-react";
+import React from "react";
 
 export const ThemeSwitch: React.FC = () => {
   const [theme, setTheme] = useAtom(themeAtom);
   const [mode] = useAtom(modeAtom);
-  const [, toggleMode] = useAtom(toggleModeAtom);
+  const toggleMode = useSetAtom(toggleModeAtom);
   const themes = getAvailableThemes();
 
   return (
