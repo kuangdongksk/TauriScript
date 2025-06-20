@@ -8,12 +8,12 @@ import Home from "./pages/home/Home";
 function App() {
   return (
     <ThemeProvider>
-      <div className="flex h-screen">
-        <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={HTML5Backend}>
+        <div className="flex h-screen">
           <Toaster />
           <Home />
-        </DndProvider>
-      </div>
+        </div>
+      </DndProvider>
     </ThemeProvider>
   );
 }
