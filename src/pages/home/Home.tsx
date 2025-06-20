@@ -3,6 +3,7 @@ import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import SettingsIcon from "@mui/icons-material/Settings";
 // import { TrayIcon } from "@tauri-apps/api/tray";
 // import { useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { NavLink, Route, Routes } from "react-router-dom";
 import BreakOverlay from "../Pomodoro/BreakOverlay";
 import Pomodoro from "../Pomodoro/Pomodoro";
@@ -21,57 +22,46 @@ function Home() {
       <Route
         path="*"
         element={
-          <div className="flex h-screen w-full bg-gray-50 dark:bg-primary-500">
+          <div className="flex h-screen w-full bg-primary text-primary-foreground">
             {/* 侧边栏 */}
-            <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+            <aside className="w-64  border-r  ">
               <nav className="p-4">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-                  工具箱
-                </h2>
+                <h2 className="text-lg font-semibold mb-4">工具箱</h2>
                 <ul className="space-y-2">
                   <li>
-                    <NavLink
-                      to="/vditorNote"
-                      className={({ isActive }) =>
-                        `flex items-center px-4 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? "bg-blue-500 text-white"
-                            : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        }`
-                      }
-                    >
-                      <AccessAlarmsIcon />
-                      笔记
+                    <NavLink to="/vditorNote">
+                      {(isActive) => {
+                        return (
+                          <Button variant={isActive ? "default" : "ghost"}>
+                            <AccessAlarmsIcon />
+                            笔记
+                          </Button>
+                        );
+                      }}
                     </NavLink>
                   </li>
                   <li>
-                    <NavLink
-                      to="/pomodoro"
-                      className={({ isActive }) =>
-                        `flex items-center px-4 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? "bg-blue-500 text-white"
-                            : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        }`
-                      }
-                    >
-                      <AccessAlarmsIcon />
-                      番茄钟
+                    <NavLink to="/pomodoro">
+                      {(isActive) => {
+                        return (
+                          <Button variant={isActive ? "default" : "ghost"}>
+                            <AccessAlarmsIcon />
+                            番茄钟
+                          </Button>
+                        );
+                      }}
                     </NavLink>
                   </li>
                   <li>
-                    <NavLink
-                      to="/setting"
-                      className={({ isActive }) =>
-                        `flex items-center px-4 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? "bg-blue-500 text-white"
-                            : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        }`
-                      }
-                    >
-                      <SettingsIcon />
-                      设置
+                    <NavLink to="/setting">
+                      {(isActive) => {
+                        return (
+                          <Button variant={isActive ? "default" : "ghost"}>
+                            <SettingsIcon />
+                            设置
+                          </Button>
+                        );
+                      }}
                     </NavLink>
                   </li>
                 </ul>
