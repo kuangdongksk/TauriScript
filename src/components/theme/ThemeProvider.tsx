@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
-import { useAtomValue } from 'jotai';
-import { themeAtom, modeAtom } from '@/store/themeAtoms';
+import React, { useEffect, useState } from "react";
+import { useAtomValue } from "jotai";
+import { themeAtom, modeAtom } from "@/store/themeAtoms";
+
+// 导入默认主题以确保至少有一个主题可用
+import "@/styles/themes/default.css";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -9,36 +12,92 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const theme = useAtomValue(themeAtom);
   const mode = useAtomValue(modeAtom);
+  const [error, setError] = useState<string | null>(null);
 
-  // 初始化主题
+  // 应用主题
   useEffect(() => {
-    const themeFile = theme === 'default' ? 'default' : 
-      theme === '紫色1' ? 'customs/紫色1' : theme;
-    
-    try {
-      // 移除之前的主题样式表
-      const oldThemeLink = document.getElementById('theme-link');
-      if (oldThemeLink) {
-        oldThemeLink.remove();
+    const loadTheme = async () => {
+      if (theme === "default") {
+        // 默认主题已经导入，无需额外操作
+        setError(null);
+        return;
       }
 
-      // 添加新的主题样式表
-      const link = document.createElement('link');
-      link.id = 'theme-link';
-      link.rel = 'stylesheet';
-      link.href = `/src/styles/themes/${themeFile}.css`;
-      document.head.appendChild(link);
-    } catch (error) {
-      console.error('Failed to load theme:', error);
-    }
+      try {
+        // 动态导入主题
+        switch (theme) {
+          case "Bubblegum":
+            await import("@/styles/themes/Bubblegum.css");
+            break;
+          case "MochaMousse":
+            await import("@/styles/themes/MochaMousse.css");
+            break;
+          case "Perpetuity":
+            await import("@/styles/themes/Perpetuity.css");
+            break;
+          case "紫色1":
+            await import("@/styles/themes/customs/紫色1.css");
+            break;
+          default:
+            // 尝试导入其他主题
+            try {
+              await import(`@/styles/themes/${theme}.css`);
+            } catch (e) {
+              console.error(`Theme ${theme} not found, using default theme.`);
+              setError(`主题 "${theme}" 不存在，已回退到默认主题。`);
+              return;
+            }
+        }
 
-    // 应用暗色模式
-    if (mode === 'dark') {
-      document.documentElement.classList.add('dark');
+        setError(null);
+        console.log(`Theme loaded: ${theme}`);
+      } catch (error) {
+        console.error("Failed to load theme:", error);
+        setError(`加载主题 "${theme}" 失败，已回退到默认主题。`);
+      }
+    };
+
+    loadTheme();
+  }, [theme]);
+
+  // 应用暗色模式
+  useEffect(() => {
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
-  }, [theme, mode]);
+  }, [mode]);
 
-  return <>{children}</>;
+  return (
+    <>
+      {error && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            padding: "10px 15px",
+            borderRadius: "4px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            zIndex: 9999,
+            animation: "fadeIn 0.3s ease-in-out",
+          }}
+        >
+          {error}
+        </div>
+      )}
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}
+      </style>
+      {children}
+    </>
+  );
 };

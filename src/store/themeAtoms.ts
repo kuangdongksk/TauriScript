@@ -5,7 +5,7 @@ import { atomWithStorage } from 'jotai/utils';
 export type ThemeMode = 'light' | 'dark';
 
 // 主题名称
-export type ThemeName = 'default' | 'Bubblegum' | 'MochaMousse' | '紫色1';
+export type ThemeName = 'default' | 'Bubblegum' | 'MochaMousse' | 'Perpetuity' | '紫色1';
 
 // 创建持久化的主题原子
 export const themeAtom = atomWithStorage<ThemeName>('theme', 'default');
@@ -25,5 +25,6 @@ export const getAvailableThemes = (): { name: ThemeName; label: string }[] => [
   { name: 'default', label: '默认主题' },
   { name: 'Bubblegum', label: '泡泡糖' },
   { name: 'MochaMousse', label: '摩卡慕斯' },
+  { name: 'Perpetuity', label: '永恒' },
   { name: '紫色1', label: '紫色主题' },
 ];
