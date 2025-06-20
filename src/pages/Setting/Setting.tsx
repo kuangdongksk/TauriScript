@@ -1,6 +1,8 @@
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Setting = () => {
   const [autoStart, setAutoStart] = useState(false);
@@ -48,12 +50,11 @@ const Setting = () => {
       </h1>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="flex items-center justify-between">
-          <span className="text-gray-700 dark:text-gray-300">开机自动启动</span>
-          <input
-            type="checkbox"
+          <Label htmlFor="airplane-mode">开机自动启动 Mode</Label>
+          <Switch
             checked={autoStart}
-            onChange={(e) => handleAutoStartChange(e.target.checked)}
-            className="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+            onCheckedChange={(e) => handleAutoStartChange(e)}
+            id="airplane-mode"
           />
         </div>
         <div className="flex items-center justify-between">
