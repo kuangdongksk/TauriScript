@@ -7,6 +7,7 @@ import { NavLink, Route, Routes } from "react-router-dom";
 import BreakOverlay from "../Pomodoro/BreakOverlay";
 import Pomodoro from "../Pomodoro/Pomodoro";
 import Setting from "../Setting/Setting";
+import VditorNote from "../Vditor";
 
 function Home() {
   // const tray = useCallback(async () => await TrayIcon.new(options), []);
@@ -28,6 +29,21 @@ function Home() {
                   工具箱
                 </h2>
                 <ul className="space-y-2">
+                  <li>
+                    <NavLink
+                      to="/vditorNote"
+                      className={({ isActive }) =>
+                        `flex items-center px-4 py-2 rounded-lg transition-colors ${
+                          isActive
+                            ? "bg-blue-500 text-white"
+                            : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`
+                      }
+                    >
+                      <AccessAlarmsIcon />
+                      笔记
+                    </NavLink>
+                  </li>
                   <li>
                     <NavLink
                       to="/pomodoro"
@@ -67,6 +83,7 @@ function Home() {
               <Routes>
                 <Route path="/pomodoro" element={<Pomodoro />} />
                 <Route path="/setting" element={<Setting />} />
+                <Route path="/vditorNote" element={<VditorNote />} />
                 <Route
                   path="/"
                   element={
