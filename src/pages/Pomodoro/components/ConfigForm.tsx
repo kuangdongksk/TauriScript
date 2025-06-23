@@ -17,6 +17,7 @@ import {
   CardAction,
   CardContent,
   CardDescription,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -30,7 +31,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { BreakTimeA, FocusTimeA, LoopTimesA } from "@/store/breakStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import CardHeader from "@mui/material/CardHeader";
 import { useSetAtom } from "jotai";
 import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -138,9 +138,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Card Title</CardTitle>
-        <CardDescription>Card Description</CardDescription>
-        <CardAction>Card Action</CardAction>
+        <CardTitle>配置</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -211,12 +209,15 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
         {/* 保存配置区域 */}
         <div className="mt-8 pt-6 border-t ">
           <div className="flex gap-2 mb-6">
-            <Input
-              placeholder="输入配置名称"
-              value={configName}
-              onChange={(e) => setConfigName(e.target.value)}
-              className="max-w-[200px]"
-            />
+            <div>
+              <Input
+                placeholder="输入配置名称"
+                value={configName}
+                onChange={(e) => setConfigName(e.target.value)}
+                className="max-w-[200px]"
+              />
+              {form.formState.errors.root && form.formState.errors.root.message}
+            </div>
             <Button
               onClick={handleSaveConfig}
               variant="outline"
@@ -284,10 +285,6 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
                 ))}
               </div>
             </div>
-          )}
-
-          {form.formState.errors.root && (
-            <p>{form.formState.errors.root.message}</p>
           )}
         </div>
       </CardContent>
