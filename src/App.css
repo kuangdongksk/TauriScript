@@ -3,5 +3,5 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  background-color: transparent;
+  /* background-color: transparent; */
 }
