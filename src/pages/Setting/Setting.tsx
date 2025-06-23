@@ -1,3 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
@@ -42,26 +45,27 @@ const Setting = () => {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
-        设置
-      </h1>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-gray-700 dark:text-gray-300">开机自动启动</span>
-          <input
-            type="checkbox"
-            checked={autoStart}
-            onChange={(e) => handleAutoStartChange(e.target.checked)}
-            className="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-gray-700 dark:text-gray-300">主题色</span>
-          <ThemeToggle />
-        </div>
-      </div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>设置</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="airplane-mode">开机自动启动 Mode</Label>
+            <Switch
+              checked={autoStart}
+              onCheckedChange={(e) => handleAutoStartChange(e)}
+              id="airplane-mode"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <span>主题色</span>
+            <ThemeToggle />
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
