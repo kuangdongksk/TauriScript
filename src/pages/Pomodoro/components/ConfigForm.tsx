@@ -239,15 +239,11 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
                   </div>
                   <div className="flex gap-2">
                     <AlertDialog>
-                      <AlertDialogTrigger>
-                        <Button
-                          className="text-red-500"
-                          variant="link"
-                          size="sm"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? "删除中..." : "删除"}
-                        </Button>
+                      <AlertDialogTrigger
+                        className="text-red-500"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "删除中..." : "删除"}
                       </AlertDialogTrigger>
                       <AlertDialogPortal>
                         <AlertDialogOverlay />
