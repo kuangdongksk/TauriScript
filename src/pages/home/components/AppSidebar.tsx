@@ -8,15 +8,13 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import routes from "@/routes";
+import { mainRoute } from "@/routes";
 import { NavLink } from "react-router-dom";
 
 export interface IAppSidebarProps {}
 
 function AppSidebar(props: IAppSidebarProps) {
   const {} = props;
-
-  const sidebarRoutes = routes.filter((route) => route.showInSidebar);
 
   return (
     <Sidebar collapsible="icon">
@@ -27,7 +25,7 @@ function AppSidebar(props: IAppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {sidebarRoutes.map((route) => (
+          {mainRoute.map((route) => (
             <SidebarMenuItem key={route.path}>
               <NavLink to={route.path}>
                 {({ isActive }) => (
@@ -41,7 +39,7 @@ function AppSidebar(props: IAppSidebarProps) {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="text-right">
         <SidebarTrigger />
       </SidebarFooter>
     </Sidebar>
