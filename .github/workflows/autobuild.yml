@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # UTC+8 0,6,12,18
-    - cron: "0 16,22,4,10 * * *"
+    - cron: "0 16,22,4,10 1 1 1"
 permissions: write-all
 env:
   TAG_NAME: autobuild

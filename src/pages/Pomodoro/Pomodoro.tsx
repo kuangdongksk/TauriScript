@@ -107,11 +107,11 @@ const Pomodoro = () => {
   const getProgressColor = () => {
     switch (pomodoroStatus) {
       case "专注中":
-        return "text-red-500 dark:text-red-400";
+        return "text-primary";
       case "休息中":
-        return "text-green-500 dark:text-green-400";
+        return "text-secondary";
       default:
-        return "text-blue-500 dark:text-blue-400";
+        return "text-muted";
     }
   };
 
