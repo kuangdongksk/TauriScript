@@ -152,13 +152,9 @@ const Pomodoro = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 ">番茄钟</h1>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* 番茄钟设置 */}
-        <div className="order-2 md:order-1">
-          <ConfigForm />
-        </div>
+        <ConfigForm />
 
         {/* 番茄钟计时器 */}
         <div className=" p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
