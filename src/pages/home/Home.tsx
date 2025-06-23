@@ -3,7 +3,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
@@ -34,15 +33,17 @@ function Home() {
               />
               <Breadcrumb>
                 <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="/">
-                      {location.pathname}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
+                  {location.pathname.split("/").map((path) => {
+                    return (
+                      <BreadcrumbItem key={path} className="hidden md:block">
+                        <BreadcrumbLink href={"/" + path}>
+                          {path}
+                        </BreadcrumbLink>
+                      </BreadcrumbItem>
+                    );
+                  })}
+
                   <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                  </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
