@@ -2,6 +2,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-body {
+:root {
   background-color: transparent;
 }
