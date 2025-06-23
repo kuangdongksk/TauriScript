@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { modeAtom, themeAtom } from "@/store/themeAtoms";
 import { useAtomValue } from "jotai";
-import { themeAtom, modeAtom } from "@/store/themeAtoms";
+import React, { useEffect, useState } from "react";
 
 // 导入默认主题以确保至少有一个主题可用
 import "@/styles/themes/default.css";
+// import BubblegumDark from "./data/Bubblegum/dark";
+// import BubblegumLight from "./data/Bubblegum/light";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -28,6 +30,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         switch (theme) {
           case "Bubblegum":
             await import("@/styles/themes/Bubblegum.css");
+
+            // if (mode === "dark") {
+            //   Object.entries(BubblegumDark).forEach(([key, value]) => {
+            //     document.documentElement.style.setProperty(key, value);
+            //   });
+            // } else {
+            //   Object.entries(BubblegumLight).forEach(([key, value]) => {
+            //     document.documentElement.style.setProperty(key, value);
+            //   });
+            // }
             break;
           case "MochaMousse":
             await import("@/styles/themes/MochaMousse.css");

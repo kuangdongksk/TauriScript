@@ -13,6 +13,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -128,169 +136,159 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-        设置
-      </h2>
-
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-x-3 gap-y-2"
-        >
-          <FormField
-            control={form.control}
-            name="focusTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>专注时间</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="专注时间" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="breakTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>休息时间</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="休息时间" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="loopTimes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>循环次数</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="循环次数" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="loopTimes"
-            render={({}) => (
-              <FormItem>
-                <FormLabel>&nbsp;</FormLabel>
-                <FormControl>
-                  <Button
-                    type="submit"
-                    disabled={isLoading || form.formState.isSubmitting}
-                  >
-                    {form.formState.isSubmitting ? "应用中..." : "应用"}
-                  </Button>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
-
-      {/* 保存配置区域 */}
-      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex gap-2 mb-6">
-          <Input
-            placeholder="输入配置名称"
-            value={configName}
-            onChange={(e) => setConfigName(e.target.value)}
-            className="max-w-[200px]"
-          />
-          <Button
-            onClick={handleSaveConfig}
-            variant="outline"
-            disabled={isLoading}
+    <Card>
+      <CardHeader>
+        <CardTitle>配置</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid grid-cols-2 gap-x-3 gap-y-2"
           >
-            {isLoading ? "保存中..." : "保存配置"}
-          </Button>
-        </div>
+            <FormField
+              control={form.control}
+              name="focusTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>专注时间</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="专注时间" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="breakTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>休息时间</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="休息时间" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="loopTimes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>循环次数</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="循环次数" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="loopTimes"
+              render={({}) => (
+                <FormItem>
+                  <FormLabel>&nbsp;</FormLabel>
+                  <FormControl>
+                    <Button
+                      type="submit"
+                      disabled={isLoading || form.formState.isSubmitting}
+                    >
+                      {form.formState.isSubmitting ? "应用中..." : "应用"}
+                    </Button>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
-        {/* 已保存的配置列表 */}
-        {savedConfigs.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-              已保存的配置
-            </h3>
-            <div className="space-y-3">
-              {savedConfigs.map((saved, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                      {saved.name}
-                    </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {saved.focusTime}分钟专注 / {saved.breakTime}分钟休息 ×{" "}
-                      {saved.loopTimes}循环
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <AlertDialog>
-                      <AlertDialogTrigger>
-                        <Button
+        {/* 保存配置区域 */}
+        <div className="mt-8 pt-6 border-t ">
+          <div className="flex gap-2 mb-6">
+            <div>
+              <Input
+                placeholder="输入配置名称"
+                value={configName}
+                onChange={(e) => setConfigName(e.target.value)}
+                className="max-w-[200px]"
+              />
+              {form.formState.errors.root && form.formState.errors.root.message}
+            </div>
+            <Button
+              onClick={handleSaveConfig}
+              variant="outline"
+              disabled={isLoading}
+            >
+              {isLoading ? "保存中..." : "保存配置"}
+            </Button>
+          </div>
+
+          {/* 已保存的配置列表 */}
+          {savedConfigs.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium ">已保存的配置</h3>
+              <div className="space-y-3">
+                {savedConfigs.map((saved, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 rounded-lg border "
+                  >
+                    <div className="flex-1">
+                      <h4 className="font-medium ">{saved.name}</h4>
+                      <p className="text-sm ">
+                        {saved.focusTime}分钟专注 / {saved.breakTime}分钟休息 ×{" "}
+                        {saved.loopTimes}循环
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger
                           className="text-red-500"
-                          variant="link"
-                          size="sm"
                           disabled={isLoading}
                         >
                           {isLoading ? "删除中..." : "删除"}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogPortal>
-                        <AlertDialogOverlay />
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>确定删除</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              是否确定删除？
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>取消</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteConfig(saved)}
-                            >
-                              确定
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialogPortal>
-                    </AlertDialog>
-                    <Button
-                      onClick={() => handleLoadConfig(saved)}
-                      variant="default"
-                      size="sm"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "加载中..." : "加载"}
-                    </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogPortal>
+                          <AlertDialogOverlay />
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>确定删除</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                是否确定删除？
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>取消</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteConfig(saved)}
+                              >
+                                确定
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialogPortal>
+                      </AlertDialog>
+                      <Button
+                        onClick={() => handleLoadConfig(saved)}
+                        variant="default"
+                        size="sm"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "加载中..." : "加载"}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-
-        {form.formState.errors.root && (
-          <p className="mt-2 text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </p>
-        )}
-      </div>
-    </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
