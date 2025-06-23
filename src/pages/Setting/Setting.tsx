@@ -52,7 +52,7 @@ const Setting = () => {
         <div className="flex items-center justify-between">
           <Label htmlFor="airplane-mode">开机自动启动 Mode</Label>
           <Switch
-            checked={autoStart}
+            // checked={autoStart}
             onCheckedChange={(e) => handleAutoStartChange(e)}
             id="airplane-mode"
           />
