@@ -59,10 +59,10 @@ const BreakOverlay = () => {
   };
 
   return (
-    <div className="w-full h-full fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="max-w-md w-full bg-white/10 rounded-xl p-8 text-center shadow-lg">
+    <div className="w-full h-full fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="max-w-md w-full  rounded-xl p-8 text-center shadow-lg">
         <h2 className="text-2xl font-bold text-white mb-2">休息时间</h2>
-        <p className="text-gray-300 mb-6">请离开电脑，休息一下眼睛和身体</p>
+        <p className="mb-6">请离开电脑，休息一下眼睛和身体</p>
 
         <div className="relative h-4 rounded-full mb-8">
           <div
@@ -84,7 +84,7 @@ const BreakOverlay = () => {
           ></div>
         </div>
 
-        <div className="text-5xl font-bold text-white mb-8">
+        <div className="text-5xl font-bold mb-8">
           {dayjs.duration(remainingTime, "seconds").format("mm:ss")}
         </div>
 
@@ -92,14 +92,11 @@ const BreakOverlay = () => {
           <Button
             onClick={postponeBreak}
             variant="outline"
-            className="min-w-[140px] bg-gray-600 hover:bg-gray-500 text-white border-gray-500"
+            className="min-w-[140px] "
           >
             5分钟后休息
           </Button>
-          <Button
-            onClick={endBreak}
-            className="min-w-[140px] bg-green-600 hover:bg-green-500"
-          >
+          <Button onClick={endBreak} className="min-w-[140px] ">
             开始专注
           </Button>
         </div>

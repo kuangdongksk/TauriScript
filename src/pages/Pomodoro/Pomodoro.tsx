@@ -152,9 +152,7 @@ const Pomodoro = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">
-        番茄钟
-      </h1>
+      <h1 className="text-3xl font-bold mb-8 ">番茄钟</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* 番茄钟设置 */}
@@ -163,7 +161,7 @@ const Pomodoro = () => {
         </div>
 
         {/* 番茄钟计时器 */}
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
+        <div className=" p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
           <Timer
             status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
             version={timerVersion}
@@ -184,16 +182,8 @@ const Pomodoro = () => {
 
           {/* 状态信息 */}
           <div className="mb-8 text-center">
-            {pomodoroStatus === "专注中" && (
-              <p className="text-gray-600 dark:text-gray-300">
-                专注时间 {focusTime} 分钟
-              </p>
-            )}
-            {pomodoroStatus === "休息中" && (
-              <p className="text-gray-600 dark:text-gray-300">
-                休息时间 {breakTime} 分钟
-              </p>
-            )}
+            {pomodoroStatus === "专注中" && <p>专注时间 {focusTime} 分钟</p>}
+            {pomodoroStatus === "休息中" && <p>休息时间 {breakTime} 分钟</p>}
           </div>
         </div>
       </div>

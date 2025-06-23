@@ -12,10 +12,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import AppSidebar from "./components/AppSidebar";
 
 function Home() {
+  const location = useLocation();
+
   return (
     <div className="flex h-screen w-full bg-primary text-primary-foreground">
       {/* 侧边栏 */}
@@ -33,8 +35,8 @@ function Home() {
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
+                    <BreadcrumbLink href="/">
+                      {location.pathname}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />

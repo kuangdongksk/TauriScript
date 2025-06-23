@@ -128,10 +128,8 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-        设置
-      </h2>
+    <div className=" p-6 rounded-lg shadow">
+      <h2 className="text-xl font-semibold mb-4">设置</h2>
 
       <Form {...form}>
         <form
@@ -199,7 +197,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
       </Form>
 
       {/* 保存配置区域 */}
-      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-8 pt-6 border-t ">
         <div className="flex gap-2 mb-6">
           <Input
             placeholder="输入配置名称"
@@ -219,20 +217,16 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
         {/* 已保存的配置列表 */}
         {savedConfigs.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-              已保存的配置
-            </h3>
+            <h3 className="text-lg font-medium ">已保存的配置</h3>
             <div className="space-y-3">
               {savedConfigs.map((saved, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700"
+                  className="flex items-center justify-between p-3 rounded-lg border "
                 >
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                      {saved.name}
-                    </h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <h4 className="font-medium ">{saved.name}</h4>
+                    <p className="text-sm ">
                       {saved.focusTime}分钟专注 / {saved.breakTime}分钟休息 ×{" "}
                       {saved.loopTimes}循环
                     </p>
@@ -281,9 +275,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({}) => {
         )}
 
         {form.formState.errors.root && (
-          <p className="mt-2 text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </p>
+          <p>{form.formState.errors.root.message}</p>
         )}
       </div>
     </div>
