@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { useEffect, useState } from "react";
-import { ThemeToggle } from "./ThemeToggle";
+import { ThemeSwitch } from "./components/theme";
 
 const Setting = () => {
   const [autoStart, setAutoStart] = useState(false);
@@ -50,20 +50,18 @@ const Setting = () => {
         <CardTitle>设置</CardTitle>
       </CardHeader>
       <CardContent>
-        <form>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="airplane-mode">开机自动启动 Mode</Label>
-            <Switch
-              checked={autoStart}
-              onCheckedChange={(e) => handleAutoStartChange(e)}
-              id="airplane-mode"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <span>主题色</span>
-            <ThemeToggle />
-          </div>
-        </form>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="airplane-mode">开机自动启动 Mode</Label>
+          <Switch
+            checked={autoStart}
+            onCheckedChange={(e) => handleAutoStartChange(e)}
+            id="airplane-mode"
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span>主题色</span>
+          <ThemeSwitch />
+        </div>
       </CardContent>
     </Card>
   );

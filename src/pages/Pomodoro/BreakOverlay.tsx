@@ -13,6 +13,7 @@ import duration from "dayjs/plugin/duration";
 import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { EPomodoroCommands } from "./constant/enum";
+import { Progress } from "@/components/ui/progress";
 
 dayjs.extend(duration);
 
@@ -65,23 +66,9 @@ const BreakOverlay = () => {
         <p className="mb-6">请离开电脑，休息一下眼睛和身体</p>
 
         <div className="relative h-4 rounded-full mb-8">
-          <div
-            className="absolute left-0 top-0 h-full bg-green-500 rounded-full transition-all duration-1000 ease-linear"
-            style={{
-              width: `${
-                breakTime > 0
-                  ? Math.max(
-                      0,
-                      Math.min(
-                        100,
-                        ((breakTime * 60 - remainingTime) / (breakTime * 60)) *
-                          100
-                      )
-                    )
-                  : 0
-              }%`,
-            }}
-          ></div>
+          <Progress
+            value={((breakTime * 60 - remainingTime) / (breakTime * 60)) * 100}
+          />
         </div>
 
         <div className="text-5xl font-bold mb-8">
