@@ -10,12 +10,12 @@ const Timer = ({
   status,
   version,
   //
-  backgroundColor = "text-gray-200 dark:text-gray-700",
+  backgroundColor = "text-primary-foreground",
   className = "",
   initialTime = 0,
   label,
   pauseButtonText = "暂停",
-  progressColor = "text-blue-500 dark:text-blue-400",
+  progressColor = "text-primary",
   resetButtonText = "重置",
   subLabel,
   showControls = true,
@@ -106,17 +106,13 @@ const Timer = ({
 
           {/* 中间的时间显示 */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-5xl font-bold text-gray-800 dark:text-white">
+            <div className="text-5xl font-bold ">
               {status === "ready" && initialTime === 0
                 ? "--:--"
                 : dayjs.duration(timeLeft, "seconds").format("mm:ss")}
             </div>
             {label && <div className="text-lg font-medium mt-2">{label}</div>}
-            {subLabel && (
-              <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                {subLabel}
-              </div>
-            )}
+            {subLabel && <div className="text-sm  mt-2">{subLabel}</div>}
           </div>
         </div>
 
