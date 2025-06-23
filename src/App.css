@@ -170,15 +170,15 @@
   }
 }
 
-@layer utilities {
+/* @layer utilities {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+} */
 
 :root {
-  /* background-color: transparent; */
+  background-color: transparent;
 }
