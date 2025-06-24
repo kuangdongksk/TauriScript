@@ -71,6 +71,7 @@
     "@tauri-apps/plugin-window-state": "~2.2.3",
     "ahooks": "^3.8.5",
     "axios": "^1.10.0",
+    "cherry-markdown": "^0.9.4",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",

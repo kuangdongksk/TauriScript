@@ -48,6 +48,10 @@ const routeData = {
           title: "milkdown",
           url: "/noteEditor/milkdown",
         },
+        {
+          title: "cherry",
+          url: "/noteEditor/cherry",
+        },
       ],
     },
     {

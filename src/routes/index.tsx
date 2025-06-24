@@ -7,6 +7,7 @@ import VditorNote from "../pages/Note/Vditor";
 import BreakOverlay from "../pages/Pomodoro/BreakOverlay";
 import Pomodoro from "../pages/Pomodoro/Pomodoro";
 import Setting from "../pages/Setting/Setting";
+import CherryMarkdown from "@/pages/Note/CherryMarkdown";
 
 export interface RouteConfig {
   path: string;
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
           {
             path: "/noteEditor/milkdown",
             element: <MilkdownEditor />,
+          },
+          {
+            path: "/noteEditor/cherry",
+            element: <CherryMarkdown />,
           },
         ],
       },
