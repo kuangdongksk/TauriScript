@@ -12,10 +12,10 @@ import {
   SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import NoteIcon from "@mui/icons-material/Note";
-import { useNavigate } from "react-router-dom";
 import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
+import NoteIcon from "@mui/icons-material/Note";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useNavigate } from "react-router-dom";
 
 export interface IAppSidebarProps {}
 
@@ -43,6 +43,10 @@ const routeData = {
         {
           title: "vditor",
           url: "/noteEditor/vditorNote",
+        },
+        {
+          title: "milkdown",
+          url: "/noteEditor/milkdown",
         },
       ],
     },
@@ -108,7 +112,7 @@ function AppSidebar(props: IAppSidebarProps) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="text-right">
+      <SidebarFooter>
         <SidebarTrigger />
       </SidebarFooter>
     </Sidebar>

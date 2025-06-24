@@ -1,5 +1,6 @@
 import App from "@/App";
 import NoteEditor from "@/pages/Note";
+import MilkdownEditor from "@/pages/Note/MilkDown";
 import { ReactNode } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import VditorNote from "../pages/Note/Vditor";
@@ -22,11 +23,18 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/noteEditor",
-        element: <NoteEditor />,
         children: [
+          {
+            index: true,
+            element: <NoteEditor />,
+          },
           {
             path: "/noteEditor/vditorNote",
             element: <VditorNote />,
+          },
+          {
+            path: "/noteEditor/milkdown",
+            element: <MilkdownEditor />,
           },
         ],
       },
