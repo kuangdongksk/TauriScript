@@ -12,6 +12,10 @@ import {
   SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import NoteIcon from "@mui/icons-material/Note";
+import { useNavigate } from "react-router-dom";
+import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 export interface IAppSidebarProps {}
 
@@ -33,31 +37,25 @@ const routeData = {
     },
     {
       title: "笔记",
-      url: "/vditorNote",
+      url: "/noteEditor",
+      icon: <NoteIcon />,
       items: [
         {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
+          title: "vditor",
+          url: "/noteEditor/vditorNote",
         },
       ],
     },
     {
       title: "番茄钟",
       url: "/pomodoro",
+      icon: <AccessAlarmsIcon />,
       items: [],
     },
     {
       title: "设置",
       url: "/setting",
+      icon: <SettingsIcon />,
       items: [],
     },
   ],
@@ -65,6 +63,7 @@ const routeData = {
 
 function AppSidebar(props: IAppSidebarProps) {
   const {} = props;
+  const navigate = useNavigate();
 
   return (
     <Sidebar collapsible="icon">
@@ -81,9 +80,13 @@ function AppSidebar(props: IAppSidebarProps) {
                 <SidebarMenuButton
                   asChild
                   isActive={item.url === location.pathname}
+                  onClick={() => {
+                    navigate(item.url);
+                  }}
                 >
-                  <a href={item.url} className="font-medium">
-                    {item.title}
+                  <a>
+                    <span>{item.icon && item.icon}</span>
+                    <span>{item.title}</span>
                   </a>
                 </SidebarMenuButton>
                 {item.items?.length ? (

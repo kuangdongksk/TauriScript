@@ -30,12 +30,12 @@ export interface IVditorNoteProps {}
 function VditorNote(props: IVditorNoteProps) {
   const {} = props;
 
-  const vditorWrapperRef = useRef<HTMLDivElement>(null);
+  const vditorWrapper = useRef<HTMLDivElement>(null);
   const vditorRef = useRef<Vditor>(null);
 
   useEffect(() => {
-    if (vditorWrapperRef.current) {
-      vditorRef.current = new Vditor(vditorWrapperRef.current, {
+    if (vditorWrapper.current) {
+      vditorRef.current = new Vditor(vditorWrapper.current, {
         cache: {
           id: "vditorNote",
         },
@@ -223,7 +223,7 @@ function VditorNote(props: IVditorNoteProps) {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <div ref={vditorWrapperRef}></div>
+        <div id="vditor" ref={vditorWrapper}></div>
       </CardContent>
     </Card>
   );
