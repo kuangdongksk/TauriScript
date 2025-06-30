@@ -1,10 +1,10 @@
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Provider } from "jotai";
 import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
+import { ThemeProvider } from "./pages/Setting/components/theme";
 import router from "./routes";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

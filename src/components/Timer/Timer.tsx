@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
+import CardContent from "@mui/material/CardContent";
 import { useInterval } from "ahooks";
 import dayjs from "dayjs";
 import { useEffect, useImperativeHandle, useState } from "react";
+import { Card, CardFooter } from "../ui/card";
 import { TimerProps } from "./types";
-import { Card } from "../ui/card";
-import CardContent from "@mui/material/CardContent";
 
 const Timer = ({
   status,
@@ -73,7 +73,9 @@ const Timer = ({
   };
 
   return (
-    <Card className={`flex flex-col items-center justify-center ${className}`}>
+    <Card
+      className={`h-full flex flex-col items-center justify-center ${className}`}
+    >
       <CardContent>
         <div className="relative w-72 h-72 mb-8">
           {/* 背景圆环 */}
@@ -115,40 +117,38 @@ const Timer = ({
             {subLabel && <div className="text-sm  mt-2">{subLabel}</div>}
           </div>
         </div>
+      </CardContent>
 
-        {/* 控制按钮 */}
-        {showControls && (
-          <div className="flex space-x-4">
-            {status === "ready" || status === "paused" ? (
-              <Button
-                onClick={() => onStatusChange?.("running")}
-                variant="default"
-                size="lg"
-                className="min-w-[100px]"
-              >
-                {status === "ready" ? startButtonText : "继续"}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => onStatusChange?.("paused")}
-                variant="outline"
-                size="lg"
-                className="min-w-[100px]"
-              >
-                {pauseButtonText}
-              </Button>
-            )}
+      {/* 控制按钮 */}
+      {showControls && (
+        <CardFooter>
+          {status === "ready" || status === "paused" ? (
             <Button
-              onClick={handleResetClick}
+              onClick={() => onStatusChange?.("running")}
+              variant="default"
+              size="lg"
+            >
+              {status === "ready" ? startButtonText : "继续"}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => onStatusChange?.("paused")}
               variant="secondary"
               size="lg"
-              className="min-w-[100px]"
             >
-              {resetButtonText}
+              {pauseButtonText}
             </Button>
-          </div>
-        )}
-      </CardContent>
+          )}
+          <Button
+            onClick={handleResetClick}
+            variant="destructive"
+            size="lg"
+            className="ml-3"
+          >
+            {resetButtonText}
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

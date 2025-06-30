@@ -12,6 +12,10 @@ import {
   SidebarMenuSubItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
+import NoteIcon from "@mui/icons-material/Note";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { useNavigate } from "react-router-dom";
 
 export interface IAppSidebarProps {}
 
@@ -33,31 +37,33 @@ const routeData = {
     },
     {
       title: "笔记",
-      url: "/vditorNote",
+      url: "/noteEditor",
+      icon: <NoteIcon />,
       items: [
         {
-          title: "Routing",
-          url: "#",
+          title: "vditor",
+          url: "/noteEditor/vditorNote",
         },
         {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
+          title: "milkdown",
+          url: "/noteEditor/milkdown",
         },
         {
-          title: "Rendering",
-          url: "#",
+          title: "cherry",
+          url: "/noteEditor/cherry",
         },
       ],
     },
     {
       title: "番茄钟",
       url: "/pomodoro",
+      icon: <AccessAlarmsIcon />,
       items: [],
     },
     {
       title: "设置",
       url: "/setting",
+      icon: <SettingsIcon />,
       items: [],
     },
   ],
@@ -65,6 +71,7 @@ const routeData = {
 
 function AppSidebar(props: IAppSidebarProps) {
   const {} = props;
+  const navigate = useNavigate();
 
   return (
     <Sidebar collapsible="icon">
@@ -81,9 +88,13 @@ function AppSidebar(props: IAppSidebarProps) {
                 <SidebarMenuButton
                   asChild
                   isActive={item.url === location.pathname}
+                  onClick={() => {
+                    navigate(item.url);
+                  }}
                 >
-                  <a href={item.url} className="font-medium">
-                    {item.title}
+                  <a>
+                    <span>{item.icon && item.icon}</span>
+                    <span>{item.title}</span>
                   </a>
                 </SidebarMenuButton>
                 {item.items?.length ? (
@@ -105,7 +116,7 @@ function AppSidebar(props: IAppSidebarProps) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="text-right">
+      <SidebarFooter>
         <SidebarTrigger />
       </SidebarFooter>
     </Sidebar>

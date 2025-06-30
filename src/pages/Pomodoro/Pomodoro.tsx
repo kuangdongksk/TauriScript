@@ -151,38 +151,32 @@ const Pomodoro = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* 番茄钟设置 */}
-        <ConfigForm />
+    <div
+      className={
+        "grid grid-cols-1 md:grid-cols-2 gap-10 " + " h-full overflow-auto"
+      }
+    >
+      {/* 番茄钟设置 */}
+      <ConfigForm />
 
-        {/* 番茄钟计时器 */}
-        <div className=" p-8 rounded-xl shadow-lg flex flex-col items-center justify-center order-1 md:order-2">
-          <Timer
-            status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
-            version={timerVersion}
-            initialTime={getCurrentPhaseTime()}
-            progressColor={getProgressColor()}
-            label={pomodoroStatus}
-            subLabel={
-              pomodoroStatus !== "准备就绪"
-                ? `循环 ${currentLoop}/${loopTimes}`
-                : undefined
-            }
-            timerRef={timerRef}
-            onStatusChange={handleStatusChange}
-            onComplete={onComplete}
-            onReset={resetTimer}
-            className="mb-8"
-          />
-
-          {/* 状态信息 */}
-          <div className="mb-8 text-center">
-            {pomodoroStatus === "专注中" && <p>专注时间 {focusTime} 分钟</p>}
-            {pomodoroStatus === "休息中" && <p>休息时间 {breakTime} 分钟</p>}
-          </div>
-        </div>
-      </div>
+      {/* 番茄钟计时器 */}
+      <Timer
+        status={mapPomodoroStatusToTimerStatus(pomodoroStatus)}
+        version={timerVersion}
+        initialTime={getCurrentPhaseTime()}
+        progressColor={getProgressColor()}
+        label={pomodoroStatus}
+        subLabel={
+          pomodoroStatus !== "准备就绪"
+            ? `循环 ${currentLoop}/${loopTimes}`
+            : undefined
+        }
+        timerRef={timerRef}
+        onStatusChange={handleStatusChange}
+        onComplete={onComplete}
+        onReset={resetTimer}
+        className="mb-8"
+      />
     </div>
   );
 };
