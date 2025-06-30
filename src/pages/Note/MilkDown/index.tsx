@@ -18,7 +18,7 @@ Type \`/\` to see the slash command.`;
 const AutoSaveEditor: React.FC = () => {
   const pluginViewFactory = usePluginViewFactory();
 
-  const { get } = useEditor(
+  const {} = useEditor(
     (root) =>
       Editor.make()
         .config((ctx) => {
@@ -30,7 +30,7 @@ const AutoSaveEditor: React.FC = () => {
             }),
           });
           // Add markdown listener for auto-save
-          ctx.get(listenerCtx).markdownUpdated((ctx, markdown) => {
+          ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
             // Save content to your backend or storage
             saveToBackend(markdown);
           });

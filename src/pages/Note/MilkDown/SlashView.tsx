@@ -11,7 +11,7 @@ export const slash = slashFactory("Commands");
 
 export interface ISlashProps {}
 
-function SlashView(props: ISlashProps) {
+function SlashView(_props: ISlashProps) {
   const ref = useRef<HTMLDivElement>(null);
   const slashProvider = useRef<SlashProvider>(null);
 
