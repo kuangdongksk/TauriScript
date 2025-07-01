@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import "./App.css";
+import "./App.less";
 import Home from "./pages/home/Home";
 
 function App() {

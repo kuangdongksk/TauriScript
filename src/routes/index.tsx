@@ -1,13 +1,14 @@
 import App from "@/App";
 import NoteEditor from "@/pages/Note";
+import CherryMarkdown from "@/pages/Note/CherryMarkdown";
 import MilkdownEditor from "@/pages/Note/MilkDown";
+import Hello from "@/pages/hello";
 import { ReactNode } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import VditorNote from "../pages/Note/Vditor";
 import BreakOverlay from "../pages/Pomodoro/BreakOverlay";
 import Pomodoro from "../pages/Pomodoro/Pomodoro";
 import Setting from "../pages/Setting/Setting";
-import CherryMarkdown from "@/pages/Note/CherryMarkdown";
 
 export interface RouteConfig {
   path: string;
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
   {
     path: "/break-overlay",
     element: <BreakOverlay />,
+  },
+  {
+    path: "/hello",
+    element: <Hello />,
   },
 ]);
 
