@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export interface IEmailRegisterProps {
   onSwitchToLogin: () => void;
@@ -19,14 +21,26 @@ export interface IEmailRegisterProps {
 function EmailRegister(props: IEmailRegisterProps) {
   const { onSwitchToLogin } = props;
 
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // 这里将来会添加注册逻辑
-    console.log("邮箱注册:", { email, password, confirmPassword });
+    axios
+      .post(" http://localhost:2567/user/create", {
+        username,
+        email,
+        password,
+      })
+      .then((res) => {
+        toast.success("注册成功");
+        onSwitchToLogin();
+      })
+      .catch((err) => {
+        toast.error(err.msg);
+      });
   };
 
   return (
@@ -43,6 +57,16 @@ function EmailRegister(props: IEmailRegisterProps) {
       <CardContent>
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="register-username">用户名</Label>
+              <Input
+                id="register-username"
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="register-email">邮箱</Label>
               <Input

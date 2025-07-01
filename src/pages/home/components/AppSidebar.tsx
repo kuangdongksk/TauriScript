@@ -22,18 +22,8 @@ export interface IAppSidebarProps {}
 const routeData = {
   navMain: [
     {
-      title: "Getting Started",
+      title: "开始",
       url: "/",
-      items: [
-        {
-          title: "Installation",
-          url: "/",
-        },
-        {
-          title: "Project Structure",
-          url: "/",
-        },
-      ],
     },
     {
       title: "笔记",
