@@ -54,9 +54,9 @@ function EmailRegister(props: IEmailRegisterProps) {
   });
 
   // 表单提交处理
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     const { username, email, password } = values;
-    
+
     axios
       .post("http://localhost:2567/user/create", {
         username,
@@ -70,7 +70,7 @@ function EmailRegister(props: IEmailRegisterProps) {
       .catch((err) => {
         toast.error(err.response?.data?.msg || "注册失败");
       });
-  }
+  };
 
   return (
     <Card className="w-full max-w-sm shadow-lg">
@@ -119,10 +119,10 @@ function EmailRegister(props: IEmailRegisterProps) {
                 <FormItem>
                   <FormLabel>密码</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder="至少6位字符" 
-                      {...field} 
+                    <Input
+                      type="password"
+                      placeholder="至少6位字符"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -136,10 +136,10 @@ function EmailRegister(props: IEmailRegisterProps) {
                 <FormItem>
                   <FormLabel>确认密码</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder="再次输入密码" 
-                      {...field} 
+                    <Input
+                      type="password"
+                      placeholder="再次输入密码"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -150,9 +150,9 @@ function EmailRegister(props: IEmailRegisterProps) {
         </Form>
       </CardContent>
       <CardFooter>
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           onClick={form.handleSubmit(onSubmit)}
         >
           注册
