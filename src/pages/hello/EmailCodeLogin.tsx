@@ -1,16 +1,25 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 export interface IEmailCodeLoginProps {
   onSwitchToRegister: () => void;
@@ -18,17 +27,37 @@ export interface IEmailCodeLoginProps {
   onSwitchToUsernameLogin: () => void;
 }
 
+// 定义表单验证模式
+const formSchema = z.object({
+  email: z.string().email({ message: "请输入有效的邮箱地址" }),
+  code: z.string().min(6, { message: "请输入6位验证码" }).max(6),
+});
+
 function EmailCodeLogin(props: IEmailCodeLoginProps) {
   const { onSwitchToRegister, onSwitchToEmailLogin, onSwitchToUsernameLogin } =
     props;
 
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
   const [countdown, setCountdown] = useState(0);
 
-  const handleSendCode = (e: React.MouseEvent) => {
-    e.preventDefault();
+  // 使用 useForm hook 创建表单
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      code: "",
+    },
+  });
+
+  const email = form.watch("email");
+
+  const handleSendCode = () => {
     if (!email || countdown > 0) return;
+
+    // 验证邮箱格式
+    if (!z.string().email().safeParse(email).success) {
+      form.setError("email", { message: "请输入有效的邮箱地址" });
+      return;
+    }
 
     // 这里将来会添加发送验证码的逻辑
     console.log("发送验证码到:", email);
@@ -46,68 +75,80 @@ function EmailCodeLogin(props: IEmailCodeLoginProps) {
     }, 1000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // 表单提交处理
+  function onSubmit(values: z.infer<typeof formSchema>) {
     // 这里将来会添加验证码登录逻辑
-    console.log("验证码登录:", { email, code });
-  };
+    console.log("验证码登录:", values);
+  }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>验证码登录</CardTitle>
-        <CardDescription>使用邮箱验证码登录</CardDescription>
-        <CardAction>
-          <Button variant="link" onClick={onSwitchToRegister}>
+    <Card className="w-full max-w-sm shadow-lg">
+      <CardHeader className="space-y-1">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl font-bold">验证码登录</CardTitle>
+          <Button variant="link" onClick={onSwitchToRegister} className="p-0">
             注册
           </Button>
-        </CardAction>
+        </div>
+        <CardDescription>使用邮箱验证码登录</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="code-email">邮箱</Label>
-              <Input
-                id="code-email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="verification-code">验证码</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="verification-code"
-                  type="text"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="请输入验证码"
-                  maxLength={6}
-                  className="flex-1"
-                />
-                <Button
-                  variant="outline"
-                  onClick={handleSendCode}
-                  disabled={countdown > 0}
-                  className="w-32"
-                >
-                  {countdown > 0 ? `${countdown}秒后重试` : "发送验证码"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>邮箱</FormLabel>
+                  <FormControl>
+                    <Input placeholder="m@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>验证码</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input 
+                        placeholder="请输入验证码" 
+                        maxLength={6} 
+                        className="flex-1" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSendCode}
+                      disabled={countdown > 0}
+                      className="w-32 shrink-0"
+                    >
+                      {countdown > 0 ? `${countdown}秒后重试` : "发送验证码"}
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full" onClick={handleSubmit}>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          onClick={form.handleSubmit(onSubmit)}
+        >
           登录
         </Button>
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-2 mt-2">
           <Button
             variant="outline"
             className="flex-1"
