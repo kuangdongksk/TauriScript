@@ -21,6 +21,7 @@ import {
   sendEmailCode,
   SendEmailCodeParams,
 } from "../services/auth";
+import { AuthenticationService } from "@/services/AuthenticationService";
 
 // 定义认证上下文的类型
 interface AuthContextType {
@@ -104,8 +105,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const handleEmailLogin = async (params: EmailLoginParams) => {
     setLoading(true);
     try {
-      const response = await emailLogin(params);
-      handleLoginSuccess(response);
+      const response = await AuthenticationService.email({ body: params });
+      console.log("🚀 ~ handleEmailLogin ~ response:", response);
+      // handleLoginSuccess(response.data);
     } catch (error: any) {
       handleError(error);
     } finally {

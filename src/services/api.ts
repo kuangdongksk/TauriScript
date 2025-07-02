@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../config';
+import { serviceOptions } from './index.defs';
 
 /**
  * 创建一个预配置的axios实例
@@ -15,6 +16,8 @@ const api = axios.create({
     'Accept': 'application/json',
   },
 });
+
+serviceOptions.axios = api;
 
 // 请求拦截器
 api.interceptors.request.use(
@@ -41,7 +44,7 @@ api.interceptors.response.use(
     if (error.response) {
       // 服务器返回了错误状态码
       console.error('API错误:', error.response.data);
-      
+
       // 处理401未授权错误
       if (error.response.status === 401) {
         // 清除本地存储的认证信息
@@ -55,8 +58,8 @@ api.interceptors.response.use(
       // 设置请求时发生错误
       console.error('请求错误:', error.message);
     }
-    
-    return Promise.reject(error);
+
+    return error.response.data
   }
 );
 

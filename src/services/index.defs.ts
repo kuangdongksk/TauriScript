@@ -1,10 +1,6 @@
 /** Generate by swagger-axios-codegen */
 // @ts-nocheck
 /* eslint-disable */
-
-/** Generate by swagger-axios-codegen */
-/* eslint-disable */
-// @ts-nocheck
 import axiosStatic, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
 
 export interface IRequestOptions extends AxiosRequestConfig {
@@ -23,6 +19,23 @@ export interface IRequestOptions extends AxiosRequestConfig {
   withAuthorization?: boolean;
 }
 
+export interface IRequestPromise<T = any> extends Promise<IRequestResponse<T>> {}
+
+export interface IRequestResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: any;
+  config: any;
+  request?: any;
+}
+
+export interface IRequestInstance {
+  (config: any): IRequestPromise;
+  (url: string, config?: any): IRequestPromise;
+  request<T = any>(config: any): IRequestPromise<T>;
+}
+
 export interface IRequestConfig {
   method?: any;
   headers?: any;
@@ -33,7 +46,7 @@ export interface IRequestConfig {
 
 // Add options interface
 export interface ServiceOptions {
-  axios?: AxiosInstance;
+  axios?: IRequestInstance;
   /** only in axios interceptor config*/
   loading: boolean;
   showError: boolean;
@@ -102,96 +115,6 @@ export class PagedResultDto<T = any> implements IPagedResult<T> {
 
 // customer definition
 // empty
-
-export class AuthenticationService {
-  /**
-   *
-   */
-  static sendVerificationCode(
-    params: {
-      /**  */
-      email: string;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<BaseResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/sendVerificationCode';
-
-      const configs: IRequestConfig = getConfigs('get', 'application/json', url, options);
-      configs.params = { email: params['email'] };
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  static register(
-    params: {
-      /** requestBody */
-      body?: RegisterRequest;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<BaseResponse_UserResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/register';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params.body;
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  static login(
-    params: {
-      /** requestBody */
-      body?: LoginRequest;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<BaseResponse_LoginResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/login';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params.body;
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  static verify(options: IRequestOptions = {}): Promise<BaseResponse_UserResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/verify';
-
-      const configs: IRequestConfig = getConfigs('get', 'application/json', url, options);
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  static test(options: IRequestOptions = {}): Promise<BaseResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/test';
-
-      const configs: IRequestConfig = getConfigs('get', 'application/json', url, options);
-
-      axios(configs, resolve, reject);
-    });
-  }
-}
 
 /** BaseResponse */
 export interface BaseResponse {
@@ -262,11 +185,29 @@ export interface BaseResponse_LoginResponse {
   code?: number;
 }
 
-/** LoginRequest */
-export interface LoginRequest {
+/** EmailLoginRequest */
+export interface EmailLoginRequest {
   /**  */
   email: string;
 
   /**  */
   password: string;
+}
+
+/** UsernameLoginRequest */
+export interface UsernameLoginRequest {
+  /**  */
+  username: string;
+
+  /**  */
+  password: string;
+}
+
+/** EmailCodeLoginRequest */
+export interface EmailCodeLoginRequest {
+  /**  */
+  email: string;
+
+  /**  */
+  code: string;
 }

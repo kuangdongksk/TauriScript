@@ -122,7 +122,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"LoginRequest": {
+			"EmailLoginRequest": {
 				"properties": {
 					"email": {
 						"type": "string"
@@ -134,6 +134,38 @@
 				"required": [
 					"email",
 					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsernameLoginRequest": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EmailCodeLoginRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"code"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -216,39 +248,6 @@
 				}
 			}
 		},
-		"/auth/login": {
-			"post": {
-				"operationId": "Login",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
-								}
-							}
-						}
-					}
-				},
-				"description": "用户登录",
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/LoginRequest"
-							}
-						}
-					}
-				}
-			}
-		},
 		"/auth/verify": {
 			"get": {
 				"operationId": "Verify",
@@ -305,6 +304,105 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/auth/login/email": {
+			"post": {
+				"operationId": "Email",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用邮箱密码登录",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EmailLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/login/username": {
+			"post": {
+				"operationId": "Username",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用用户名密码登录",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UsernameLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/login/emailCode": {
+			"post": {
+				"operationId": "EmailCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用邮箱验证码登录",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EmailCodeLoginRequest"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

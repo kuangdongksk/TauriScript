@@ -12,8 +12,11 @@ import swagger from "./swagger.json" assert { type: "json" };
 
 codegen({
   methodNameMode: "operationId",
-  source: swagger,
+  modelMode: "interface",
+  multipleFileMode: true,
   openApi: "3.0.0",
   outputDir: "./src/services",
   useStaticMethod: true,
+  useCustomerRequestInstance: true,
+  source: swagger,
 });
