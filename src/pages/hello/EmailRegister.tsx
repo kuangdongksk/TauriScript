@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -31,6 +32,7 @@ const formSchema = z
   .object({
     username: z.string().min(3, { message: "用户名至少需要3个字符" }),
     email: z.string().email({ message: "请输入有效的邮箱地址" }),
+    code: z.string().min(6, { message: "请输入6位验证码" }).max(6),
     password: z.string().min(6, { message: "密码至少需要6个字符" }),
     confirmPassword: z.string().min(6, { message: "请确认您的密码" }),
   })
@@ -41,6 +43,7 @@ const formSchema = z
 
 function EmailRegister(props: IEmailRegisterProps) {
   const { onSwitchToLogin } = props;
+  const [countdown, setCountdown] = useState(0);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,17 +51,45 @@ function EmailRegister(props: IEmailRegisterProps) {
     defaultValues: {
       username: "",
       email: "",
+      code: "",
       password: "",
       confirmPassword: "",
     },
   });
+
+  const email = form.watch("email");
+
+  const handleSendCode = () => {
+    if (!email || countdown > 0) return;
+
+    // 验证邮箱格式
+    if (!z.string().email().safeParse(email).success) {
+      form.setError("email", { message: "请输入有效的邮箱地址" });
+      return;
+    }
+
+    // 这里将来会添加发送验证码的逻辑
+    console.log("发送验证码到:", email);
+
+    // 开始倒计时
+    setCountdown(60);
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   // 表单提交处理
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const { username, email, password } = values;
 
     axios
-      .post("http://localhost:2567/user/create", {
+      .post("/user/create", {
         username,
         email,
         password,
@@ -108,6 +139,35 @@ function EmailRegister(props: IEmailRegisterProps) {
                   <FormControl>
                     <Input placeholder="m@example.com" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>验证码</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input
+                        placeholder="请输入验证码"
+                        maxLength={6}
+                        className="flex-1"
+                        {...field}
+                      />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSendCode}
+                      disabled={countdown > 0}
+                      className="w-32 shrink-0"
+                    >
+                      {countdown > 0 ? `${countdown}秒后重试` : "发送验证码"}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

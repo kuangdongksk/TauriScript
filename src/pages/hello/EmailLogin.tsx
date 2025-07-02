@@ -19,6 +19,10 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useAuth } from "../../contexts/AuthContext";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export interface IEmailLoginProps {
   onSwitchToRegister: () => void;
@@ -41,6 +45,24 @@ function EmailLogin(props: IEmailLoginProps) {
     onSwitchToForgotPassword,
   } = props;
 
+  const navigate = useNavigate();
+  const { login, loading, error, clearError, isAuthenticated } = useAuth();
+
+  // 如果已经登录，重定向到主页
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // 如果有错误，显示错误消息
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
+
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,9 +73,17 @@ function EmailLogin(props: IEmailLoginProps) {
   });
 
   // 表单提交处理
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // 这里将来会添加登录逻辑
-    console.log("邮箱登录:", values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await login.email({
+        email: values.email,
+        password: values.password
+      });
+      toast.success('登录成功');
+      navigate('/');
+    } catch (error) {
+      // 错误已经在AuthContext中处理
+    }
   }
 
   return (
@@ -113,14 +143,16 @@ function EmailLogin(props: IEmailLoginProps) {
           type="submit" 
           className="w-full" 
           onClick={form.handleSubmit(onSubmit)}
+          disabled={loading}
         >
-          登录
+          {loading ? '登录中...' : '登录'}
         </Button>
         <div className="flex w-full gap-2 mt-2">
           <Button
             variant="outline"
             className="flex-1"
             onClick={onSwitchToUsernameLogin}
+            disabled={loading}
           >
             用户名登录
           </Button>
@@ -128,6 +160,7 @@ function EmailLogin(props: IEmailLoginProps) {
             variant="outline"
             className="flex-1"
             onClick={onSwitchToEmailCodeLogin}
+            disabled={loading}
           >
             验证码登录
           </Button>
