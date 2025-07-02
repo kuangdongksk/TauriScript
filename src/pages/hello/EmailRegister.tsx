@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
@@ -68,8 +69,15 @@ function EmailRegister(props: IEmailRegisterProps) {
       return;
     }
 
-    // 这里将来会添加发送验证码的逻辑
-    console.log("发送验证码到:", email);
+    AuthenticationService.sendVerificationCode({
+      email,
+    })
+      .then(() => {
+        toast.success("验证码已发送");
+      })
+      .catch((err) => {
+        toast.error(err.response?.data?.msg || "发送失败");
+      });
 
     // 开始倒计时
     setCountdown(60);
@@ -86,14 +94,16 @@ function EmailRegister(props: IEmailRegisterProps) {
 
   // 表单提交处理
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const { username, email, password } = values;
+    const { username, email, password, code } = values;
 
-    axios
-      .post("/user/create", {
+    AuthenticationService.register({
+      body: {
         username,
         email,
         password,
-      })
+        code,
+      },
+    })
       .then(() => {
         toast.success("注册成功");
         onSwitchToLogin();

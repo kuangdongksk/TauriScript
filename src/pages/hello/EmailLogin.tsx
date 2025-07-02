@@ -16,13 +16,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useAuth } from "../../contexts/AuthContext";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import * as z from "zod";
+import { useAuth } from "../../contexts/AuthContext";
 
 export interface IEmailLoginProps {
   onSwitchToRegister: () => void;
@@ -46,22 +47,14 @@ function EmailLogin(props: IEmailLoginProps) {
   } = props;
 
   const navigate = useNavigate();
-  const { login, loading, error, clearError, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
 
   // 如果已经登录，重定向到主页
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
-
-  // 如果有错误，显示错误消息
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError();
-    }
-  }, [error, clearError]);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,16 +67,18 @@ function EmailLogin(props: IEmailLoginProps) {
 
   // 表单提交处理
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await login.email({
-        email: values.email,
-        password: values.password
+    AuthenticationService.email({
+      body: values,
+    })
+      .then((res) => {
+        if (res.data) {
+          localStorage.setItem("token", res.data.token);
+        }
+        navigate("/");
+      })
+      .catch((err) => {
+        toast.error(err.msg);
       });
-      toast.success('登录成功');
-      navigate('/');
-    } catch (error) {
-      // 错误已经在AuthContext中处理
-    }
   }
 
   return (
@@ -139,13 +134,13 @@ function EmailLogin(props: IEmailLoginProps) {
         </Form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           onClick={form.handleSubmit(onSubmit)}
           disabled={loading}
         >
-          {loading ? '登录中...' : '登录'}
+          {loading ? "登录中..." : "登录"}
         </Button>
         <div className="flex w-full gap-2 mt-2">
           <Button

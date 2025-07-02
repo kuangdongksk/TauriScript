@@ -37,9 +37,14 @@ api.interceptors.request.use(
 // 响应拦截器
 api.interceptors.response.use(
   (response) => {
-    return response;
+    if (response.data.code === 200) { return response; }
+    return Promise.reject(response.data);
   },
-  (error) => {
+  async (error): Promise<{
+    code: number;
+    msg: string;
+    data: any;
+  }> => {
     // 处理错误响应
     if (error.response) {
       // 处理401未授权错误
@@ -55,9 +60,18 @@ api.interceptors.response.use(
       // 设置请求时发生错误
       console.error('请求错误:', error.message);
     }
-
-    throw error;
+    return await Promise.reject<{
+      code: number,
+      msg: string,
+      data: any
+    }
+    >({
+      code: error.response.status,
+      msg: error.message,
+      data: error
+    });
   }
 );
+
 
 export default api;
