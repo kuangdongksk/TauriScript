@@ -20,39 +20,44 @@
 				},
 				"required": [
 					"msg",
-					"data"
+					"data",
+					"code"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
 			"UserResponse": {
 				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"username": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"id",
-					"username",
-					"email"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"BaseResponse_UserResponse_": {
-				"properties": {
 					"msg": {
 						"type": "string"
 					},
 					"data": {
-						"$ref": "#/components/schemas/UserResponse"
+						"anyOf": [
+							{
+								"properties": {
+									"email": {
+										"type": "string"
+									},
+									"username": {
+										"type": "string"
+									},
+									"id": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"email",
+									"username",
+									"id"
+								],
+								"type": "object"
+							},
+							{
+								"properties": {},
+								"type": "object"
+							}
+						]
 					},
 					"code": {
 						"type": "number",
@@ -61,7 +66,8 @@
 				},
 				"required": [
 					"msg",
-					"data"
+					"data",
+					"code"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -92,23 +98,43 @@
 			},
 			"LoginResponse": {
 				"properties": {
-					"token": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"token"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"BaseResponse_LoginResponse_": {
-				"properties": {
 					"msg": {
 						"type": "string"
 					},
 					"data": {
-						"$ref": "#/components/schemas/LoginResponse"
+						"properties": {
+							"user": {
+								"anyOf": [
+									{
+										"properties": {
+											"email": {
+												"type": "string"
+											},
+											"username": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"email",
+											"username"
+										],
+										"type": "object"
+									},
+									{
+										"properties": {},
+										"type": "object"
+									}
+								]
+							},
+							"token": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"user",
+							"token"
+						],
+						"type": "object"
 					},
 					"code": {
 						"type": "number",
@@ -117,7 +143,8 @@
 				},
 				"required": [
 					"msg",
-					"data"
+					"data",
+					"code"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -224,7 +251,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_UserResponse_"
+									"$ref": "#/components/schemas/UserResponse"
 								}
 							}
 						}
@@ -257,7 +284,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_UserResponse_"
+									"$ref": "#/components/schemas/UserResponse"
 								}
 							}
 						}
@@ -284,47 +311,25 @@
 				]
 			}
 		},
-		"/auth/test": {
-			"get": {
-				"operationId": "Test",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/BaseResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Authentication"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
 		"/auth/login/email": {
 			"post": {
-				"operationId": "Email",
+				"operationId": "LoginByEmail",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+									"$ref": "#/components/schemas/LoginResponse"
 								}
 							}
 						}
 					}
 				},
-				"description": "使用邮箱密码登录",
 				"tags": [
 					"Authentication"
 				],
+				"deprecated": true,
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -348,7 +353,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+									"$ref": "#/components/schemas/LoginResponse"
 								}
 							}
 						}
@@ -381,7 +386,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/BaseResponse_LoginResponse_"
+									"$ref": "#/components/schemas/LoginResponse"
 								}
 							}
 						}

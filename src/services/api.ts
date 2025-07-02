@@ -38,7 +38,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     if (response.data.code === 200) { return response; }
-    return Promise.reject(response.data);
+    return Promise.reject(new Error(response.data.msg));
   },
   async (error): Promise<{
     code: number;
@@ -60,16 +60,7 @@ api.interceptors.response.use(
       // 设置请求时发生错误
       console.error('请求错误:', error.message);
     }
-    return await Promise.reject<{
-      code: number,
-      msg: string,
-      data: any
-    }
-    >({
-      code: error.response.status,
-      msg: error.message,
-      data: error
-    });
+    return await Promise.reject(new Error(error.message || error.request));
   }
 );
 

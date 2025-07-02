@@ -125,31 +125,19 @@ export interface BaseResponse {
   data: any | null;
 
   /**  */
-  code?: number;
+  code: number;
 }
 
 /** UserResponse */
 export interface UserResponse {
   /**  */
-  id: number;
-
-  /**  */
-  username: string;
-
-  /**  */
-  email: string;
-}
-
-/** BaseResponse_UserResponse */
-export interface BaseResponse_UserResponse {
-  /**  */
   msg: string;
 
   /**  */
-  data: UserResponse;
+  data: any | null;
 
   /**  */
-  code?: number;
+  code: number;
 }
 
 /** RegisterRequest */
@@ -170,19 +158,13 @@ export interface RegisterRequest {
 /** LoginResponse */
 export interface LoginResponse {
   /**  */
-  token: string;
-}
-
-/** BaseResponse_LoginResponse */
-export interface BaseResponse_LoginResponse {
-  /**  */
   msg: string;
 
   /**  */
-  data: LoginResponse;
+  data: object;
 
   /**  */
-  code?: number;
+  code: number;
 }
 
 /** EmailLoginRequest */

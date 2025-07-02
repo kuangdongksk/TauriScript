@@ -16,13 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import * as z from "zod";
 
 export interface IEmailCodeLoginProps {
   onSwitchToRegister: () => void;
@@ -40,27 +40,11 @@ function EmailCodeLogin(props: IEmailCodeLoginProps) {
   const { onSwitchToRegister, onSwitchToEmailLogin, onSwitchToUsernameLogin } =
     props;
 
+  const navigate = useNavigate();
+
   const [countdown, setCountdown] = useState(0);
   const [sendingCode, setSendingCode] = useState(false);
-
-  const navigate = useNavigate();
-  const { login, loading, error, clearError, isAuthenticated } = useAuth();
-  const { sendEmailCode } = login;
-
-  // 如果已经登录，重定向到主页
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-
-  // 如果有错误，显示错误消息
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError();
-    }
-  }, [error, clearError]);
+  const [loading, setLoading] = useState(false);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -78,48 +62,54 @@ function EmailCodeLogin(props: IEmailCodeLoginProps) {
 
     // 验证邮箱格式
     if (!z.string().email().safeParse(email).success) {
-      form.setError("email", { message: "请输入有效的邮箱地址" });
+      form.setError("email", { message: "请输入有效的邮箱地址！" });
       return;
     }
 
-    try {
-      setSendingCode(true);
-      await sendEmailCode({
-        email,
-        purpose: "login",
-      });
-      toast.success("验证码已发送，请查收邮件");
+    setLoading(true);
+    AuthenticationService.sendVerificationCode({
+      email,
+    })
+      .then(() => {
+        setSendingCode(true);
 
-      // 开始倒计时
-      setCountdown(60);
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch (error) {
-      // 错误已经在AuthContext中处理
-    } finally {
-      setSendingCode(false);
-    }
+        toast.success("验证码已发送，请查收邮件！");
+
+        // 开始倒计时
+        setCountdown(60);
+        const timer = setInterval(() => {
+          setCountdown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      })
+      .catch((err: Error) => {
+        toast.error(err.message || "发送失败！");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   // 表单提交处理
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await login.emailCode({
+    AuthenticationService.emailCode({
+      body: {
         email: values.email,
         code: values.code,
+      },
+    })
+      .then(() => {
+        toast.success("登录成功");
+        navigate("/");
+      })
+      .catch((err: Error) => {
+        toast.error(err.message);
       });
-      toast.success("登录成功");
-      navigate("/");
-    } catch (error) {
-      // 错误已经在AuthContext中处理
-    }
   }
 
   return (

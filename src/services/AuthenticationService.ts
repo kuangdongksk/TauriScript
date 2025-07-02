@@ -1,10 +1,8 @@
 import {
   BaseResponse,
   RegisterRequest,
-  BaseResponse_UserResponse,
   UserResponse,
   EmailLoginRequest,
-  BaseResponse_LoginResponse,
   LoginResponse,
   UsernameLoginRequest,
   EmailCodeLoginRequest,
@@ -56,7 +54,7 @@ export class AuthenticationService {
       body?: RegisterRequest;
     } = {} as any,
     options: IRequestOptions = {}
-  ): Promise<BaseResponse_UserResponse> {
+  ): Promise<UserResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/register';
 
@@ -72,7 +70,7 @@ export class AuthenticationService {
   /**
    *
    */
-  static verify(options: IRequestOptions = {}): Promise<BaseResponse_UserResponse> {
+  static verify(options: IRequestOptions = {}): Promise<UserResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/verify';
 
@@ -84,25 +82,13 @@ export class AuthenticationService {
   /**
    *
    */
-  static test(options: IRequestOptions = {}): Promise<BaseResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/auth/test';
-
-      const configs: IRequestConfig = getConfigs('get', 'application/json', url, options);
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  static email(
+  static loginByEmail(
     params: {
       /** requestBody */
       body?: EmailLoginRequest;
     } = {} as any,
     options: IRequestOptions = {}
-  ): Promise<BaseResponse_LoginResponse> {
+  ): Promise<LoginResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/login/email';
 
@@ -124,7 +110,7 @@ export class AuthenticationService {
       body?: UsernameLoginRequest;
     } = {} as any,
     options: IRequestOptions = {}
-  ): Promise<BaseResponse_LoginResponse> {
+  ): Promise<LoginResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/login/username';
 
@@ -146,7 +132,7 @@ export class AuthenticationService {
       body?: EmailCodeLoginRequest;
     } = {} as any,
     options: IRequestOptions = {}
-  ): Promise<BaseResponse_LoginResponse> {
+  ): Promise<LoginResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/login/emailCode';
 
