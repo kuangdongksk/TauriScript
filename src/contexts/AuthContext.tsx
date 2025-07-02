@@ -1,34 +1,33 @@
+import { AuthenticationService } from "@/services/AuthenticationService";
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
 import {
-  emailLogin,
-  usernameLogin,
-  emailCodeLogin,
-  register,
-  logout,
-  getCurrentUser,
   checkAuth,
-  LoginResponse,
-  EmailLoginParams,
-  UsernameLoginParams,
+  emailCodeLogin,
   EmailCodeLoginParams,
+  EmailLoginParams,
+  getCurrentUser,
+  LoginResponse,
+  logout,
+  register,
   RegisterParams,
   sendEmailCode,
   SendEmailCodeParams,
+  usernameLogin,
+  UsernameLoginParams,
 } from "../services/auth";
-import { AuthenticationService } from "@/services/AuthenticationService";
+import { toast } from "sonner";
 
 // 定义认证上下文的类型
 interface AuthContextType {
   isAuthenticated: boolean;
   user: LoginResponse["user"] | null;
   loading: boolean;
-  error: string | null;
   login: {
     email: (params: EmailLoginParams) => Promise<void>;
     username: (params: UsernameLoginParams) => Promise<void>;
@@ -37,7 +36,6 @@ interface AuthContextType {
   };
   register: (params: RegisterParams) => Promise<void>;
   logout: () => Promise<void>;
-  clearError: () => void;
 }
 
 // 创建认证上下文
@@ -53,7 +51,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkAuth());
   const [user, setUser] = useState<LoginResponse["user"] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   // 在组件挂载时检查认证状态
   useEffect(() => {
@@ -79,13 +76,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem("token", response.token);
     setUser(response.user);
     setIsAuthenticated(true);
-    setError(null);
   };
 
   // 处理错误
   const handleError = (error: any) => {
-    console.error("认证错误:", error);
-    setError(error.response?.data?.message || "发生错误，请稍后再试");
+    toast.error(error.response?.data?.message || "发生错误，请稍后再试");
     setLoading(false);
   };
 
@@ -104,15 +99,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 邮箱登录
   const handleEmailLogin = async (params: EmailLoginParams) => {
     setLoading(true);
-    try {
-      const response = await AuthenticationService.email({ body: params });
-      console.log("🚀 ~ handleEmailLogin ~ response:", response);
-      // handleLoginSuccess(response.data);
-    } catch (error: any) {
-      handleError(error);
-    } finally {
-      setLoading(false);
-    }
+    AuthenticationService.email({ body: params })
+      .then((response) => {
+        handleLoginSuccess(response);
+      })
+      .catch((error) => {
+        handleError(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   // 用户名登录
@@ -168,17 +164,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // 清除错误
-  const clearError = () => {
-    setError(null);
-  };
-
   // 提供的上下文值
   const contextValue: AuthContextType = {
     isAuthenticated,
     user,
     loading,
-    error,
     login: {
       email: handleEmailLogin,
       username: handleUsernameLogin,
@@ -187,7 +177,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
     register: handleRegister,
     logout: handleLogout,
-    clearError,
   };
 
   return (

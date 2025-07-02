@@ -42,9 +42,6 @@ api.interceptors.response.use(
   (error) => {
     // 处理错误响应
     if (error.response) {
-      // 服务器返回了错误状态码
-      console.error('API错误:', error.response.data);
-
       // 处理401未授权错误
       if (error.response.status === 401) {
         // 清除本地存储的认证信息
@@ -59,7 +56,7 @@ api.interceptors.response.use(
       console.error('请求错误:', error.message);
     }
 
-    return error.response.data
+    throw error;
   }
 );
 

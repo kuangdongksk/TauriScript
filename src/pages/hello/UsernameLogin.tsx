@@ -41,22 +41,14 @@ function UsernameLogin(props: IUsernameLoginProps) {
     props;
 
   const navigate = useNavigate();
-  const { login, loading, error, clearError, isAuthenticated } = useAuth();
+  const { login, loading, isAuthenticated } = useAuth();
 
   // 如果已经登录，重定向到主页
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
-
-  // 如果有错误，显示错误消息
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError();
-    }
-  }, [error, clearError]);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,10 +64,10 @@ function UsernameLogin(props: IUsernameLoginProps) {
     try {
       await login.username({
         username: values.username,
-        password: values.password
+        password: values.password,
       });
-      toast.success('登录成功');
-      navigate('/');
+      toast.success("登录成功");
+      navigate("/");
     } catch (error) {
       // 错误已经在AuthContext中处理
     }
@@ -135,13 +127,13 @@ function UsernameLogin(props: IUsernameLoginProps) {
         </Form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           onClick={form.handleSubmit(onSubmit)}
           disabled={loading}
         >
-          {loading ? '登录中...' : '登录'}
+          {loading ? "登录中..." : "登录"}
         </Button>
         <Button
           variant="outline"
