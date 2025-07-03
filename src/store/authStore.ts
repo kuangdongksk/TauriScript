@@ -4,4 +4,4 @@ export const authTokenA = atomWithStorage('authToken', '');
 export const userInfoA = atomWithStorage<{
   username: string;
   email: string;
-} | {}>('userInfo', {});
+} | null>('userInfo', null);
