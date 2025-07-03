@@ -90,8 +90,6 @@ export class AuthenticationService {
     } = {} as any,
     options: IRequestOptions = {}
   ): Promise<LoginResponse> {
-    console.log("🚀 ~ AuthenticationService ~ Promise:",)
-
     return new Promise((resolve, reject) => {
       let url = basePath + '/auth/login/email';
 
@@ -100,7 +98,6 @@ export class AuthenticationService {
       let data = params.body;
 
       configs.data = data;
-      console.log("🚀 ~ AuthenticationService ~ returnnewPromise ~ configs:",axios)
 
       axios(configs, resolve, reject);
     });

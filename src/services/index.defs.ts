@@ -56,15 +56,16 @@ export interface ServiceOptions {
 export const serviceOptions: ServiceOptions = {};
 
 // Instance selector
-export async function axios(configs: IRequestConfig, resolve: (p: any) => void, reject: (p: any) => void): Promise<any> {
+export function axios(configs: IRequestConfig, resolve: (p: any) => void, reject: (p: any) => void): Promise<any> {
   if (serviceOptions.axios) {
-    try {
-      const res = await serviceOptions.axios
-        .request(configs);
-      resolve(res.data);
-    } catch (err) {
-      reject(err);
-    }
+    return serviceOptions.axios
+      .request(configs)
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   } else {
     throw new Error('please inject yourself instance like axios  ');
   }
@@ -117,29 +118,35 @@ export class PagedResultDto<T = any> implements IPagedResult<T> {
 
 /** BaseResponse */
 export interface BaseResponse {
-  /**  */
-  msg: string;
+  /** 状态码 */
+  code: number;
 
-  /**  */
+  /** 数据 */
   data: any | null;
 
-  /**  */
-  code: number;
+  /** 消息 */
+  msg: string;
 }
 
 /** TUserReqData */
-export interface TUserReqData {}
+export interface TUserReqData {
+  /**  */
+  user: object;
+
+  /**  */
+  token: string;
+}
 
 /** UserResponse */
 export interface UserResponse {
-  /**  */
-  msg: string;
+  /** 状态码 */
+  code: number;
 
-  /**  */
+  /** 数据 */
   data: TUserReqData;
 
-  /**  */
-  code: number;
+  /** 消息 */
+  msg: string;
 }
 
 /** RegisterRequest */
@@ -159,14 +166,14 @@ export interface RegisterRequest {
 
 /** LoginResponse */
 export interface LoginResponse {
-  /**  */
-  msg: string;
+  /** 状态码 */
+  code: number;
 
-  /**  */
+  /** 数据 */
   data: TUserReqData;
 
-  /**  */
-  code: number;
+  /** 消息 */
+  msg: string;
 }
 
 /** EmailLoginRequest */

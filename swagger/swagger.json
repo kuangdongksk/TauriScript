@@ -9,83 +9,74 @@
 		"schemas": {
 			"BaseResponse": {
 				"properties": {
-					"msg": {
-						"type": "string"
-					},
-					"data": {},
 					"code": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
 					}
 				},
 				"required": [
-					"msg",
+					"code",
 					"data",
-					"code"
+					"msg"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
 			"TUserReqData": {
-				"anyOf": [
-					{
+				"properties": {
+					"user": {
 						"properties": {
-							"user": {
-								"anyOf": [
-									{
-										"properties": {
-											"email": {
-												"type": "string"
-											},
-											"username": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"email",
-											"username"
-										],
-										"type": "object"
-									},
-									{
-										"properties": {},
-										"type": "object"
-									}
-								]
+							"email": {
+								"type": "string"
 							},
-							"token": {
+							"username": {
 								"type": "string"
 							}
 						},
 						"required": [
-							"user",
-							"token"
+							"email",
+							"username"
 						],
 						"type": "object"
 					},
-					{
-						"properties": {},
-						"type": "object"
-					}
-				]
-			},
-			"UserResponse": {
-				"properties": {
-					"msg": {
+					"token": {
 						"type": "string"
-					},
-					"data": {
-						"$ref": "#/components/schemas/TUserReqData"
-					},
-					"code": {
-						"type": "number",
-						"format": "double"
 					}
 				},
 				"required": [
-					"msg",
+					"user",
+					"token"
+				],
+				"type": "object"
+			},
+			"UserResponse": {
+				"properties": {
+					"code": {
+						"type": "number",
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"$ref": "#/components/schemas/TUserReqData",
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
+					}
+				},
+				"required": [
+					"code",
 					"data",
-					"code"
+					"msg"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -96,7 +87,8 @@
 						"type": "string"
 					},
 					"email": {
-						"type": "string"
+						"type": "string",
+						"pattern": "^(.+)@(.+)$"
 					},
 					"password": {
 						"type": "string"
@@ -116,21 +108,24 @@
 			},
 			"LoginResponse": {
 				"properties": {
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"$ref": "#/components/schemas/TUserReqData"
-					},
 					"code": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"$ref": "#/components/schemas/TUserReqData",
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
 					}
 				},
 				"required": [
-					"msg",
+					"code",
 					"data",
-					"code"
+					"msg"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -198,7 +193,7 @@
 	"paths": {
 		"/auth/sendVerificationCode": {
 			"get": {
-				"operationId": "SendVerificationCode",
+				"operationId": "sendVerificationCode",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -211,7 +206,6 @@
 						}
 					}
 				},
-				"description": "发送验证码到指定邮箱",
 				"tags": [
 					"Authentication"
 				],
