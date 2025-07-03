@@ -20,7 +20,6 @@ import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -39,8 +38,6 @@ const formSchema = z.object({
 function EmailCodeLogin(props: IEmailCodeLoginProps) {
   const { onSwitchToRegister, onSwitchToEmailLogin, onSwitchToUsernameLogin } =
     props;
-
-  const navigate = useNavigate();
 
   const [countdown, setCountdown] = useState(0);
   const [sendingCode, setSendingCode] = useState(false);

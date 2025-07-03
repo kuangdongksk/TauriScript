@@ -18,13 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 export interface IEmailRegisterProps {
+  onLoginSuccess: (token: string, user: any) => void;
   onSwitchToLogin: () => void;
 }
 

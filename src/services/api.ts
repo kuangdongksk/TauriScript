@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../config';
+import envConfig from '../utils/envConfig';
 import { serviceOptions } from './index.defs';
 
 /**
@@ -9,7 +9,7 @@ import { serviceOptions } from './index.defs';
  * 所有API请求都应该使用这个实例，而不是直接使用axios
  */
 const api = axios.create({
-  baseURL: config.apiBaseUrl,
+  baseURL: envConfig.apiBaseUrl,
   timeout: 10000, // 10秒超时
   headers: {
     'Content-Type': 'application/json',

@@ -25,7 +25,7 @@ export const IS_PROD = NODE_ENV === 'production';
 export const IS_TEST = NODE_ENV === 'test';
 
 // 导出默认配置对象
-const config = {
+const envConfig = {
   apiBaseUrl: API_BASE_URL,
   env: NODE_ENV,
   isDev: IS_DEV,
@@ -33,4 +33,4 @@ const config = {
   isTest: IS_TEST,
 };
 
-export default config;
+export default envConfig;

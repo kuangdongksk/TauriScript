@@ -26,6 +26,7 @@ import * as z from "zod";
 import { useAuth } from "../../contexts/AuthContext";
 
 export interface IEmailLoginProps {
+  onLoginSuccess: (token: string, user: any) => void;
   onSwitchToRegister: () => void;
   onSwitchToUsernameLogin: () => void;
   onSwitchToEmailCodeLogin: () => void;
