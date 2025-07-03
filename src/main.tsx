@@ -4,9 +4,13 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { Toaster } from "./components/ui/sonner";
 import { ThemeProvider } from "./pages/Setting/components/theme";
 import router from "./routes";
+import api from "./services/api";
+import { serviceOptions } from "./services/index.defs";
+import { Toaster } from "./components/ui/sonner";
+
+serviceOptions.axios = api;
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

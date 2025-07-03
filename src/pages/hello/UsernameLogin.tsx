@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 export interface IUsernameLoginProps {
+  onLoginSuccess: (token: string, user: any) => void;
   onSwitchToRegister: () => void;
   onSwitchToEmailLogin: () => void;
   onSwitchToForgotPassword: () => void;
@@ -37,10 +38,12 @@ const formSchema = z.object({
 });
 
 function UsernameLogin(props: IUsernameLoginProps) {
-  const { onSwitchToRegister, onSwitchToEmailLogin, onSwitchToForgotPassword } =
-    props;
-
-  const navigate = useNavigate();
+  const {
+    onLoginSuccess,
+    onSwitchToRegister,
+    onSwitchToEmailLogin,
+    onSwitchToForgotPassword,
+  } = props;
 
   const [loading, setLoading] = useState(false);
 
@@ -63,8 +66,7 @@ function UsernameLogin(props: IUsernameLoginProps) {
       },
     })
       .then((res) => {
-        toast.success("登录成功");
-        navigate("/");
+        onLoginSuccess(res.data.token, res.data.user);
       })
       .catch((err) => {
         toast.error(err.response?.data?.msg || "登录失败");

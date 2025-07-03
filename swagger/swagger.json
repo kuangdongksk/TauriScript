@@ -26,38 +26,56 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"TUserReqData": {
+				"anyOf": [
+					{
+						"properties": {
+							"user": {
+								"anyOf": [
+									{
+										"properties": {
+											"email": {
+												"type": "string"
+											},
+											"username": {
+												"type": "string"
+											}
+										},
+										"required": [
+											"email",
+											"username"
+										],
+										"type": "object"
+									},
+									{
+										"properties": {},
+										"type": "object"
+									}
+								]
+							},
+							"token": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"user",
+							"token"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {},
+						"type": "object"
+					}
+				]
+			},
 			"UserResponse": {
 				"properties": {
 					"msg": {
 						"type": "string"
 					},
 					"data": {
-						"anyOf": [
-							{
-								"properties": {
-									"email": {
-										"type": "string"
-									},
-									"username": {
-										"type": "string"
-									},
-									"id": {
-										"type": "number",
-										"format": "double"
-									}
-								},
-								"required": [
-									"email",
-									"username",
-									"id"
-								],
-								"type": "object"
-							},
-							{
-								"properties": {},
-								"type": "object"
-							}
-						]
+						"$ref": "#/components/schemas/TUserReqData"
 					},
 					"code": {
 						"type": "number",
@@ -102,39 +120,7 @@
 						"type": "string"
 					},
 					"data": {
-						"properties": {
-							"user": {
-								"anyOf": [
-									{
-										"properties": {
-											"email": {
-												"type": "string"
-											},
-											"username": {
-												"type": "string"
-											}
-										},
-										"required": [
-											"email",
-											"username"
-										],
-										"type": "object"
-									},
-									{
-										"properties": {},
-										"type": "object"
-									}
-								]
-							},
-							"token": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"user",
-							"token"
-						],
-						"type": "object"
+						"$ref": "#/components/schemas/TUserReqData"
 					},
 					"code": {
 						"type": "number",

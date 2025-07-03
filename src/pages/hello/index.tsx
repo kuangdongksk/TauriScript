@@ -64,6 +64,7 @@ function Hello(_props: IHelloProps) {
 
       {currentView === "usernameLogin" && (
         <UsernameLogin
+          onLoginSuccess={onLoginSuccess}
           onSwitchToRegister={handleSwitchToRegister}
           onSwitchToEmailLogin={handleSwitchToEmailLogin}
           onSwitchToForgotPassword={handleSwitchToForgotPassword}
@@ -72,6 +73,7 @@ function Hello(_props: IHelloProps) {
 
       {currentView === "emailCodeLogin" && (
         <EmailCodeLogin
+          onLoginSuccess={onLoginSuccess}
           onSwitchToRegister={handleSwitchToRegister}
           onSwitchToEmailLogin={handleSwitchToEmailLogin}
           onSwitchToUsernameLogin={handleSwitchToUsernameLogin}

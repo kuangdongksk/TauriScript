@@ -20,7 +20,6 @@ import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
 export interface IEmailLoginProps {
@@ -39,13 +38,12 @@ const formSchema = z.object({
 
 function EmailLogin(props: IEmailLoginProps) {
   const {
+    onLoginSuccess,
     onSwitchToRegister,
     onSwitchToUsernameLogin,
     onSwitchToEmailCodeLogin,
     onSwitchToForgotPassword,
   } = props;
-
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
@@ -60,17 +58,18 @@ function EmailLogin(props: IEmailLoginProps) {
 
   // 表单提交处理
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
     AuthenticationService.loginByEmail({
       body: values,
     })
       .then((res) => {
-        if (res.data) {
-          localStorage.setItem("token", res.data.token);
-        }
-        navigate("/");
+        onLoginSuccess(res.data.token, res.data.user);
       })
-      .catch((err) => {
-        toast.error(err.msg);
+      .catch((err: Error) => {
+        toast.error(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 

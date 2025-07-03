@@ -43,7 +43,7 @@ const formSchema = z
   });
 
 function EmailRegister(props: IEmailRegisterProps) {
-  const { onSwitchToLogin } = props;
+  const { onLoginSuccess, onSwitchToLogin } = props;
   const [countdown, setCountdown] = useState(0);
 
   // 使用 useForm hook 创建表单
@@ -104,9 +104,8 @@ function EmailRegister(props: IEmailRegisterProps) {
         code,
       },
     })
-      .then(() => {
-        toast.success("注册成功");
-        onSwitchToLogin();
+      .then((res) => {
+        onLoginSuccess(res.data.token, res.data.user);
       })
       .catch((err) => {
         toast.error(err.response?.data?.msg || "注册失败");

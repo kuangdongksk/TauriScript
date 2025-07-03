@@ -56,16 +56,15 @@ export interface ServiceOptions {
 export const serviceOptions: ServiceOptions = {};
 
 // Instance selector
-export function axios(configs: IRequestConfig, resolve: (p: any) => void, reject: (p: any) => void): Promise<any> {
+export async function axios(configs: IRequestConfig, resolve: (p: any) => void, reject: (p: any) => void): Promise<any> {
   if (serviceOptions.axios) {
-    return serviceOptions.axios
-      .request(configs)
-      .then((res) => {
-        resolve(res.data);
-      })
-      .catch((err) => {
-        reject(err);
-      });
+    try {
+      const res = await serviceOptions.axios
+        .request(configs);
+      resolve(res.data);
+    } catch (err) {
+      reject(err);
+    }
   } else {
     throw new Error('please inject yourself instance like axios  ');
   }
@@ -128,13 +127,16 @@ export interface BaseResponse {
   code: number;
 }
 
+/** TUserReqData */
+export interface TUserReqData {}
+
 /** UserResponse */
 export interface UserResponse {
   /**  */
   msg: string;
 
   /**  */
-  data: any | null;
+  data: TUserReqData;
 
   /**  */
   code: number;
@@ -161,7 +163,7 @@ export interface LoginResponse {
   msg: string;
 
   /**  */
-  data: object;
+  data: TUserReqData;
 
   /**  */
   code: number;

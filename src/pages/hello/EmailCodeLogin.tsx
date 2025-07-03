@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 export interface IEmailCodeLoginProps {
+  onLoginSuccess: (token: string, user: any) => void;
   onSwitchToRegister: () => void;
   onSwitchToEmailLogin: () => void;
   onSwitchToUsernameLogin: () => void;
@@ -36,8 +37,12 @@ const formSchema = z.object({
 });
 
 function EmailCodeLogin(props: IEmailCodeLoginProps) {
-  const { onSwitchToRegister, onSwitchToEmailLogin, onSwitchToUsernameLogin } =
-    props;
+  const {
+    onLoginSuccess,
+    onSwitchToRegister,
+    onSwitchToEmailLogin,
+    onSwitchToUsernameLogin,
+  } = props;
 
   const [countdown, setCountdown] = useState(0);
   const [sendingCode, setSendingCode] = useState(false);
@@ -100,9 +105,8 @@ function EmailCodeLogin(props: IEmailCodeLoginProps) {
         code: values.code,
       },
     })
-      .then(() => {
-        toast.success("登录成功");
-        navigate("/");
+      .then((res) => {
+        onLoginSuccess(res.data.token, res.data.user);
       })
       .catch((err: Error) => {
         toast.error(err.message);

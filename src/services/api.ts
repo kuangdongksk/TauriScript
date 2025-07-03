@@ -1,6 +1,5 @@
 import axios from 'axios';
 import envConfig from '../utils/envConfig';
-import { serviceOptions } from './index.defs';
 
 /**
  * 创建一个预配置的axios实例
@@ -17,7 +16,6 @@ const api = axios.create({
   },
 });
 
-serviceOptions.axios = api;
 
 // 请求拦截器
 api.interceptors.request.use(
@@ -30,7 +28,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(new Error(error));
   }
 );
 
