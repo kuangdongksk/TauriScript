@@ -5,7 +5,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "./components/ui/sonner";
-import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./pages/Setting/components/theme";
 import router from "./routes";
 
@@ -13,12 +12,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <Provider>
       <ThemeProvider>
-        <AuthProvider>
-          <DndProvider backend={HTML5Backend}>
-            <Toaster position="top-center" />
-            <RouterProvider router={router} />
-          </DndProvider>
-        </AuthProvider>
+        <DndProvider backend={HTML5Backend}>
+          <Toaster position="top-center" />
+          <RouterProvider router={router} />
+        </DndProvider>
       </ThemeProvider>
     </Provider>
   </React.StrictMode>

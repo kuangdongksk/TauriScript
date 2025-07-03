@@ -18,13 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
-import { useAuth } from "../../contexts/AuthContext";
-
 export interface IEmailLoginProps {
   onLoginSuccess: (token: string, user: any) => void;
   onSwitchToRegister: () => void;
@@ -48,14 +46,8 @@ function EmailLogin(props: IEmailLoginProps) {
   } = props;
 
   const navigate = useNavigate();
-  const { loading, isAuthenticated } = useAuth();
 
-  // 如果已经登录，重定向到主页
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+  const [loading, setLoading] = useState(false);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,7 +60,7 @@ function EmailLogin(props: IEmailLoginProps) {
 
   // 表单提交处理
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    AuthenticationService.email({
+    AuthenticationService.loginByEmail({
       body: values,
     })
       .then((res) => {

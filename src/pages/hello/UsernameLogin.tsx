@@ -16,13 +16,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthenticationService } from "@/services/AuthenticationService";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useAuth } from "../../contexts/AuthContext";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import * as z from "zod";
 
 export interface IUsernameLoginProps {
   onSwitchToRegister: () => void;
@@ -41,14 +41,8 @@ function UsernameLogin(props: IUsernameLoginProps) {
     props;
 
   const navigate = useNavigate();
-  const { login, loading, isAuthenticated } = useAuth();
 
-  // 如果已经登录，重定向到主页
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+  const [loading, setLoading] = useState(false);
 
   // 使用 useForm hook 创建表单
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,16 +55,23 @@ function UsernameLogin(props: IUsernameLoginProps) {
 
   // 表单提交处理
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await login.username({
+    setLoading(true);
+    AuthenticationService.username({
+      body: {
         username: values.username,
         password: values.password,
+      },
+    })
+      .then((res) => {
+        toast.success("登录成功");
+        navigate("/");
+      })
+      .catch((err) => {
+        toast.error(err.response?.data?.msg || "登录失败");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      toast.success("登录成功");
-      navigate("/");
-    } catch (error) {
-      // 错误已经在AuthContext中处理
-    }
   }
 
   return (
