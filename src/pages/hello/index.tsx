@@ -1,6 +1,6 @@
 import { authTokenA, userInfoA } from "@/store/authStore";
-import { useSetAtom } from "jotai";
-import { useState } from "react";
+import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EmailCodeLogin from "./EmailCodeLogin";
 import EmailLogin from "./EmailLogin";
@@ -19,7 +19,7 @@ type AuthView =
 
 function Hello(_props: IHelloProps) {
   const navigate = useNavigate();
-  const setAuthToken = useSetAtom(authTokenA);
+  const [authToken, setAuthToken] = useAtom(authTokenA);
   const setUserInfo = useSetAtom(userInfoA);
 
   const [currentView, setCurrentView] = useState<AuthView>("邮箱密码登录");
@@ -42,6 +42,12 @@ function Hello(_props: IHelloProps) {
     setUserInfo(user);
     navigate("/");
   };
+
+  useEffect(() => {
+    if (authToken) {
+      navigate("/");
+    }
+  }, [authToken]);
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
