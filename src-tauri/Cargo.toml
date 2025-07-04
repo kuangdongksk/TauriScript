@@ -1,6 +1,6 @@
 [package]
 name = "script"
-version = "0.1.10"
+version = "0.1.11"
 description = "小工具"
 authors = ["kd"]
 edition = "2024"
