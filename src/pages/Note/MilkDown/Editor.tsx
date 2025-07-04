@@ -7,7 +7,7 @@ import "@milkdown/theme-nord/style.css";
 import { usePluginViewFactory } from "@prosemirror-adapter/react";
 import type { FC } from "react";
 import { BlockView } from "./view/Block";
-import { slash, SlashView } from "./view/SlashView";
+import { slash, SlashView } from "./view/Slash";
 
 const markdown = `# Milkdown React Slash
 
@@ -38,6 +38,7 @@ export const MilkdownEditor: FC = () => {
       })
       .config(nord)
       .use(commonmark)
+      .use(block)
       .use(slash);
   }, []);
 
