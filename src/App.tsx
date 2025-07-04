@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (!token) {
+    if (token === "未登录") {
       toast.error("您还未登录！");
       navigate("/hello");
     }
