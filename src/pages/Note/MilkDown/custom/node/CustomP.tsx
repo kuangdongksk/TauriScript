@@ -6,6 +6,6 @@ function CustomP(props: ICustomPProps) {
   const {} = props;
   const { contentRef } = useNodeViewContext();
 
-  return <text className="text-[20px]" ref={contentRef} />;
+  return <p className="text-[20px]" ref={contentRef} />;
 }
 export default CustomP;
