@@ -25,48 +25,38 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         return;
       }
 
-      try {
-        // 动态导入主题
-        switch (theme) {
-          case "Bubblegum":
-            await import("@/styles/themes/Bubblegum.css");
+      // 动态导入主题
+      switch (theme) {
+        case "Bubblegum":
+          await import("@/styles/themes/Bubblegum.css");
 
-            // if (mode === "dark") {
-            //   Object.entries(BubblegumDark).forEach(([key, value]) => {
-            //     document.documentElement.style.setProperty(key, value);
-            //   });
-            // } else {
-            //   Object.entries(BubblegumLight).forEach(([key, value]) => {
-            //     document.documentElement.style.setProperty(key, value);
-            //   });
-            // }
-            break;
-          case "MochaMousse":
-            await import("@/styles/themes/MochaMousse.css");
-            break;
-          case "Perpetuity":
-            await import("@/styles/themes/Perpetuity.css");
-            break;
-          case "紫色1":
-            await import("@/styles/themes/customs/紫色1.css");
-            break;
-          default:
-            // 尝试导入其他主题
-            try {
-              await import(`@/styles/themes/${theme}.css`);
-            } catch (e) {
-              console.error(`Theme ${theme} not found, using default theme.`);
-              setError(`主题 "${theme}" 不存在，已回退到默认主题。`);
-              return;
-            }
-        }
-
-        setError(null);
-        console.log(`Theme loaded: ${theme}`);
-      } catch (error) {
-        console.error("Failed to load theme:", error);
-        setError(`加载主题 "${theme}" 失败，已回退到默认主题。`);
+          // if (mode === "dark") {
+          //   Object.entries(BubblegumDark).forEach(([key, value]) => {
+          //     document.documentElement.style.setProperty(key, value);
+          //   });
+          // } else {
+          //   Object.entries(BubblegumLight).forEach(([key, value]) => {
+          //     document.documentElement.style.setProperty(key, value);
+          //   });
+          // }
+          break;
+        case "MochaMousse":
+          await import("@/styles/themes/MochaMousse.css");
+          break;
+        case "Perpetuity":
+          await import("@/styles/themes/Perpetuity.css");
+          break;
+        case "紫色1":
+          await import("@/styles/themes/customs/紫色1.css");
+          break;
+        default:
+          await import(`@/styles/themes/default.css`);
+          console.error(`主题 "${theme}" 不存在，已回退到默认主题。`);
+          setError(`主题 "${theme}" 不存在，已回退到默认主题。`);
+          return;
       }
+
+      setError(null);
     };
 
     loadTheme();

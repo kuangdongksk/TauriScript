@@ -29,11 +29,11 @@ const AutoSaveEditor: React.FC = () => {
               component: SlashView,
             }),
           });
-          // Add markdown listener for auto-save
-          ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
-            // Save content to your backend or storage
-            saveToBackend(markdown);
-          });
+          // // Add markdown listener for auto-save
+          // ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
+          //   // Save content to your backend or storage
+          //   saveToBackend(markdown);
+          // });
         })
         .use(commonmark)
         .use(slash)
@@ -41,9 +41,9 @@ const AutoSaveEditor: React.FC = () => {
     []
   );
 
-  const saveToBackend = (markdown: string) => {
-    console.log("🚀 ~ saveToBackend ~ markdown:", markdown);
-  };
+  // const saveToBackend = (markdown: string) => {
+  //   console.log("🚀 ~ saveToBackend ~ markdown:", markdown);
+  // };
 
   return <Milkdown />;
 };
