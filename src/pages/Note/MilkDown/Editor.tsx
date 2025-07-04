@@ -1,13 +1,13 @@
 import { defaultValueCtx, Editor, rootCtx } from "@milkdown/kit/core";
-import type { FC } from "react";
-
+import { block } from "@milkdown/kit/plugin/block";
 import { commonmark } from "@milkdown/kit/preset/commonmark";
 import { Milkdown, useEditor } from "@milkdown/react";
 import { nord } from "@milkdown/theme-nord";
-import { usePluginViewFactory } from "@prosemirror-adapter/react";
-
 import "@milkdown/theme-nord/style.css";
-import { slash, SlashView } from "./SlashView";
+import { usePluginViewFactory } from "@prosemirror-adapter/react";
+import type { FC } from "react";
+import { BlockView } from "./view/Block";
+import { slash, SlashView } from "./view/SlashView";
 
 const markdown = `# Milkdown React Slash
 
@@ -28,6 +28,11 @@ export const MilkdownEditor: FC = () => {
         ctx.set(slash.key, {
           view: pluginViewFactory({
             component: SlashView,
+          }),
+        });
+        ctx.set(block.key, {
+          view: pluginViewFactory({
+            component: BlockView,
           }),
         });
       })

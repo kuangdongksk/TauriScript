@@ -1,20 +1,13 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { editorViewCtx } from "@milkdown/kit/core";
 import { Ctx } from "@milkdown/kit/ctx";
-import { slashFactory, SlashProvider } from "@milkdown/plugin-slash";
 import { createCodeBlockCommand } from "@milkdown/kit/preset/commonmark";
-import { useInstance } from "@milkdown/react";
 import { callCommand } from "@milkdown/kit/utils";
+import { slashFactory, SlashProvider } from "@milkdown/plugin-slash";
+import { useInstance } from "@milkdown/react";
 import { usePluginViewContext } from "@prosemirror-adapter/react";
 import React, { useCallback, useEffect, useRef } from "react";
-import { commonmark } from "@milkdown/kit/preset/commonmark";
-import { Button } from "@/components/ui/button";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-} from "@/components/ui/menubar";
-import { Card, CardContent } from "@/components/ui/card";
 
 export const slash = slashFactory("Commands");
 
