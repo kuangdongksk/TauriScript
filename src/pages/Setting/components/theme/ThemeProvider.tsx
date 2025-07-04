@@ -2,11 +2,6 @@ import { modeAtom, themeAtom } from "@/store/themeAtoms";
 import { useAtomValue } from "jotai";
 import React, { useEffect, useState } from "react";
 
-// 导入默认主题以确保至少有一个主题可用
-import "@/styles/themes/default.css";
-// import BubblegumDark from "./data/Bubblegum/dark";
-// import BubblegumLight from "./data/Bubblegum/light";
-
 interface ThemeProviderProps {
   children: React.ReactNode;
 }
@@ -19,12 +14,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // 应用主题
   useEffect(() => {
     const loadTheme = async () => {
-      if (theme === "default") {
-        // 默认主题已经导入，无需额外操作
-        setError(null);
-        return;
-      }
-
       // 动态导入主题
       switch (theme) {
         case "Bubblegum":
@@ -50,7 +39,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           await import("@/styles/themes/customs/紫色1.css");
           break;
         default:
-          await import(`@/styles/themes/default.css`);
+          await import("@/styles/themes/Perpetuity.css");
           console.error(`主题 "${theme}" 不存在，已回退到默认主题。`);
           setError(`主题 "${theme}" 不存在，已回退到默认主题。`);
           return;
