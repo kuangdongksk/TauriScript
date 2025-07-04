@@ -5,10 +5,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  SidebarInset,
-  SidebarProvider
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { Outlet, useLocation } from "react-router-dom";
 import AppSidebar from "./components/AppSidebar";

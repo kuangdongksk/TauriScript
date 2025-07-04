@@ -1,7 +1,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
@@ -10,30 +9,21 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import NoteIcon from "@mui/icons-material/Note";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate } from "react-router-dom";
+import AppSidebarFooter from "./AppSideBarFooter";
+import TauriSvg from "../../../assets/tauri.svg";
 
 export interface IAppSidebarProps {}
 
 const routeData = {
   navMain: [
     {
-      title: "Getting Started",
+      title: "开始",
       url: "/",
-      items: [
-        {
-          title: "Installation",
-          url: "/",
-        },
-        {
-          title: "Project Structure",
-          url: "/",
-        },
-      ],
     },
     {
       title: "笔记",
@@ -77,7 +67,7 @@ function AppSidebar(props: IAppSidebarProps) {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">工具箱</h2>
+          <img className="w-[24px] h-[24px]" src={TauriSvg} alt="tauri" />
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -116,9 +106,7 @@ function AppSidebar(props: IAppSidebarProps) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarTrigger />
-      </SidebarFooter>
+      <AppSidebarFooter />
     </Sidebar>
   );
 }

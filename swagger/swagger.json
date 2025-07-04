@@ -1,0 +1,399 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"BaseResponse": {
+				"properties": {
+					"code": {
+						"type": "number",
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
+					}
+				},
+				"required": [
+					"code",
+					"data",
+					"msg"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TUserReqData": {
+				"properties": {
+					"user": {
+						"properties": {
+							"email": {
+								"type": "string"
+							},
+							"username": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"email",
+							"username"
+						],
+						"type": "object"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"user",
+					"token"
+				],
+				"type": "object"
+			},
+			"UserResponse": {
+				"properties": {
+					"code": {
+						"type": "number",
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"$ref": "#/components/schemas/TUserReqData",
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
+					}
+				},
+				"required": [
+					"code",
+					"data",
+					"msg"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RegisterRequest": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string",
+						"pattern": "^(.+)@(.+)$"
+					},
+					"password": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"email",
+					"password",
+					"code"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LoginResponse": {
+				"properties": {
+					"code": {
+						"type": "number",
+						"format": "double",
+						"description": "状态码"
+					},
+					"data": {
+						"$ref": "#/components/schemas/TUserReqData",
+						"description": "数据"
+					},
+					"msg": {
+						"type": "string",
+						"description": "消息"
+					}
+				},
+				"required": [
+					"code",
+					"data",
+					"msg"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EmailLoginRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsernameLoginRequest": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EmailCodeLoginRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email",
+					"code"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "my-app",
+		"version": "1.0.0",
+		"description": "npm init template for bootstrapping an empty Colyseus project",
+		"license": {
+			"name": "UNLICENSED"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/auth/sendVerificationCode": {
+			"get": {
+				"operationId": "sendVerificationCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BaseResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/register": {
+			"post": {
+				"operationId": "Register",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "用户注册",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegisterRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/verify": {
+			"get": {
+				"operationId": "Verify",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "验证令牌并获取用户信息",
+				"tags": [
+					"Authentication"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/login/email": {
+			"post": {
+				"operationId": "LoginByEmail",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Authentication"
+				],
+				"deprecated": true,
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EmailLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/login/username": {
+			"post": {
+				"operationId": "Username",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用用户名密码登录",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UsernameLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/login/emailCode": {
+			"post": {
+				"operationId": "EmailCode",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "使用邮箱验证码登录",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EmailCodeLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

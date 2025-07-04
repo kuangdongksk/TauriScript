@@ -35,6 +35,7 @@ export default defineConfig(async () => ({
       plugins: [jotaiDebugLabel, jotaiReactRefresh]
     }
   }), tailwindcss()],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -48,6 +49,13 @@ export default defineConfig(async () => ({
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:8080',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, 'http://localhost:8080')
+    //   }
+    // },
     strictPort: true,
     host: host || false,
     hmr: host
