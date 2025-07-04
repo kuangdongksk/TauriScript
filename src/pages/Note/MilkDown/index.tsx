@@ -4,10 +4,11 @@ import type { FC } from "react";
 import { MilkdownEditor } from "./Editor";
 import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react";
 import { Card, CardContent } from "@/components/ui/card";
+import "./index.less";
 
 const Editor: FC = () => {
   return (
-    <Card className="h-full bg-primary text-primary-foreground">
+    <Card className="h-full ">
       <CardContent>
         <MilkdownProvider>
           <ProsemirrorAdapterProvider>

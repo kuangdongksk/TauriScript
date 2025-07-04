@@ -1,0 +1,52 @@
+.milkdown {
+  /* Background Colors */
+  --crepe-color-background: var(--background); /* Main background color */
+  --crepe-color-surface: var(--card); /* Surface color for cards/panels */
+  --crepe-color-surface-low: var(--muted); /* Lower surface color for depth */
+
+  /* Text Colors */
+  --crepe-color-on-background: var(--foreground); /* Text color on background */
+  --crepe-color-on-surface: var(--card-foreground); /* Text color on surface */
+  --crepe-color-on-surface-variant: var(
+    --muted-foreground
+  ); /* Secondary text color */
+
+  /* Accent Colors */
+  --crepe-color-primary: var(--primary); /* Primary brand color */
+  --crepe-color-secondary: var(--secondary); /* Secondary accent color */
+  --crepe-color-on-secondary: var(
+    --secondary-foreground
+  ); /* Text color on secondary */
+
+  /* UI Colors */
+  --crepe-color-outline: var(--border); /* Border/outline color */
+  --crepe-color-inverse: var(--accent); /* Inverse color for contrast */
+  --crepe-color-on-inverse: var(
+    --accent-foreground
+  ); /* Text color on inverse */
+  --crepe-color-inline-code: var(--primary); /* Inline code color */
+  --crepe-color-error: var(--destructive); /* Error state color */
+
+  /* Interactive Colors */
+  --crepe-color-hover: var(--muted); /* Hover state color */
+  --crepe-color-selected: var(--accent); /* Selected state color */
+  --crepe-color-inline-area: var(--secondary); /* Inline editing area color */
+
+  /* Font Families */
+  --crepe-font-title: var(--font-serif);
+  --crepe-font-default: var(--font-sans);
+  --crepe-font-code: var(--font-mono);
+
+  /* Small Shadow */
+  --crepe-shadow-1: var(--shadow-sm);
+  /* Large Shadow */
+  --crepe-shadow-2: var(--shadow-md);
+
+  p:hover{
+    background-color: var(--primary);
+  }
+
+  .ProseMirror-selectednode {
+    background-color: var(--primary);
+  }
+}

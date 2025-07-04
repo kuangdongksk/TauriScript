@@ -8,6 +8,7 @@ import { slashFactory, SlashProvider } from "@milkdown/plugin-slash";
 import { useInstance } from "@milkdown/react";
 import { usePluginViewContext } from "@prosemirror-adapter/react";
 import React, { useCallback, useEffect, useRef } from "react";
+import CodeRoundedIcon from "@mui/icons-material/CodeRounded";
 
 export const slash = slashFactory("Commands");
 
@@ -44,7 +45,7 @@ export const SlashView = () => {
   });
 
   const command = (e: React.KeyboardEvent | React.MouseEvent) => {
-    e.preventDefault(); // Prevent the keyboad key to be inserted in the editor.
+    e.preventDefault(); // 阻止键盘输入插入到编辑器中。
     action((ctx) => {
       const view = ctx.get(editorViewCtx);
       const { dispatch, state } = view;
@@ -70,6 +71,7 @@ export const SlashView = () => {
             command(e);
           }}
         >
+          <CodeRoundedIcon />
           代码块
         </Button>
         <Button
@@ -78,6 +80,7 @@ export const SlashView = () => {
             command(e);
           }}
         >
+          <CodeRoundedIcon />
           代码块
         </Button>
       </CardContent>
