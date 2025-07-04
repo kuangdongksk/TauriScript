@@ -13,7 +13,7 @@ export interface IAppSidebarFooterProps {}
 function AppSidebarFooter(props: IAppSidebarFooterProps) {
   const {} = props;
 
-  const [user, setUser] = useAtom(userInfoA);
+  const [user] = useAtom(userInfoA);
 
   return (
     <SidebarFooter>
