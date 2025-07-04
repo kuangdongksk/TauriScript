@@ -1,25 +1,16 @@
 import {
   BaseResponse,
+  EmailCodeLoginRequest,
+  EmailLoginRequest,
+  IRequestConfig,
+  IRequestOptions,
+  LoginResponse,
   RegisterRequest,
   UserResponse,
-  TUserReqData,
-  EmailLoginRequest,
-  LoginResponse,
   UsernameLoginRequest,
-  EmailCodeLoginRequest,
-  IList,
-  List,
-  IListResult,
-  ListResultDto,
-  IPagedResult,
-  PagedResultDto,
-  Dictionary,
-  IDictionary,
-  IRequestOptions,
-  IRequestConfig,
-  getConfigs,
   axios,
-  basePath
+  basePath,
+  getConfigs
 } from './index.defs';
 
 export class AuthenticationService {

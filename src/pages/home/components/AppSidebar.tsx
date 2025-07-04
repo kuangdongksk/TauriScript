@@ -14,7 +14,7 @@ import AccessAlarmsIcon from "@mui/icons-material/AccessAlarms";
 import NoteIcon from "@mui/icons-material/Note";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate } from "react-router-dom";
-import AppSidebarFooter from "./AppSideBarFooter";
+import AppSidebarFooter from "./AppSidebarFooter";
 import TauriSvg from "../../../assets/tauri.svg";
 
 export interface IAppSidebarProps {}
