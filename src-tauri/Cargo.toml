@@ -15,7 +15,7 @@ name = "script_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri = { version = "2.0.0", features = [ "tray-icon" ] }
+tauri = { version = "2.0.0", features = [ "tray-icon", "devtools" ] }
 tauri-build = { version = "2.2.0", features = [] }
 
 [dependencies]

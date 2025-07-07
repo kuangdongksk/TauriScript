@@ -15,10 +15,12 @@ export default defineConfig(async () => ({
         manualChunks: (id: string) => {
 
           if (id.includes('node_modules')) {
+            if (id.includes('radix-ui')) {
+              return 'vendor-framework-radix-ui'
+            }
             if (id.includes('ahooks')) {
               return 'vendor-framework-react-ahooks'
             }
-
             if (id.includes('react')) {
               return 'vendor-framework-react'
             }
