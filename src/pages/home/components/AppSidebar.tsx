@@ -78,14 +78,12 @@ function AppSidebar(props: IAppSidebarProps) {
                 <SidebarMenuButton
                   asChild
                   isActive={item.url === location.pathname}
-                  onClick={() => {
-                    navigate(item.url);
-                  }}
+                  onClick={() => navigate(item.url)}
                 >
-                  <a>
+                  <span>
                     <span>{item.icon && item.icon}</span>
                     <span>{item.title}</span>
-                  </a>
+                  </span>
                 </SidebarMenuButton>
                 {item.items?.length ? (
                   <SidebarMenuSub>
@@ -94,8 +92,9 @@ function AppSidebar(props: IAppSidebarProps) {
                         <SidebarMenuSubButton
                           asChild
                           isActive={item.url === location.pathname}
+                          onClick={() => navigate(item.url)}
                         >
-                          <a href={item.url}>{item.title}</a>
+                          <span>{item.title}</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

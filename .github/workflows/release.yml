@@ -31,14 +31,14 @@ jobs:
       - name: 检查 tag 和 package.json的版本
         run: |
           TAG_REF="${GITHUB_REF##*/}"
-          echo "Current tag: $TAG_REF"
+          echo "当前标签: $TAG_REF"
           PKG_VERSION=$(jq -r .version package.json)
-          echo "package.json version: $PKG_VERSION"
+          echo "package.json 版本: $PKG_VERSION"
           if [[ "$TAG_REF" != "v$PKG_VERSION" ]]; then
             echo "Tag ($TAG_REF) does not match package.json version (v$PKG_VERSION)."
             exit 1
           fi
-          echo "Tag 和 package.json 版本 are consistent."
+          echo "Tag 和 package.json 版本是一致的。"
 
   release:
     name: 构建Release
@@ -76,19 +76,19 @@ jobs:
           cache-all-crates: true
           cache-on-failure: true
 
-      - name: Install dependencies (ubuntu only)
+      - name: 安装依赖 (仅ubuntu)
         if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libxslt1.1 libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
 
-      - name: Install Node
+      - name: 安装Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
       - uses: pnpm/action-setup@v4
-        name: 安装 pnpm
+        name: 安装pnpm
         with:
           version: "10.11.1"
           run_install: false

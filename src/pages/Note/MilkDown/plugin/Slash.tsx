@@ -1,17 +1,18 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { editorViewCtx } from "@milkdown/kit/core";
 import { Ctx } from "@milkdown/kit/ctx";
-import { slashFactory, SlashProvider } from "@milkdown/kit/plugin/slash";
 import { createCodeBlockCommand } from "@milkdown/kit/preset/commonmark";
-import { useInstance } from "@milkdown/react";
 import { callCommand } from "@milkdown/kit/utils";
+import { slashFactory, SlashProvider } from "@milkdown/plugin-slash";
+import { useInstance } from "@milkdown/react";
 import { usePluginViewContext } from "@prosemirror-adapter/react";
 import React, { useCallback, useEffect, useRef } from "react";
+import CodeRoundedIcon from "@mui/icons-material/CodeRounded";
 
 export const slash = slashFactory("Commands");
 
-export interface ISlashProps {}
-
-function SlashView(_props: ISlashProps) {
+export const SlashView = () => {
   const ref = useRef<HTMLDivElement>(null);
   const slashProvider = useRef<SlashProvider>(null);
 
@@ -44,7 +45,7 @@ function SlashView(_props: ISlashProps) {
   });
 
   const command = (e: React.KeyboardEvent | React.MouseEvent) => {
-    e.preventDefault(); // Prevent the keyboad key to be inserted in the editor.
+    e.preventDefault(); // 阻止键盘输入插入到编辑器中。
     action((ctx) => {
       const view = ctx.get(editorViewCtx);
       const { dispatch, state } = view;
@@ -52,26 +53,37 @@ function SlashView(_props: ISlashProps) {
       const { from } = selection;
       dispatch(tr.deleteRange(from - 1, from));
       view.focus();
+
       return callCommand(createCodeBlockCommand.key)(ctx);
     });
   };
 
   return (
-    <div
+    <Card
       ref={ref}
       aria-expanded="false"
-      className="absolute data-[show='false']:hidden"
+      className="absolute data-[show='false']:hidden py-3"
     >
-      <button
-        className="text-gray-600 bg-slate-200 px-2 py-1 rounded-lg hover:bg-slate-300 border hover:text-gray-900"
-        onKeyDown={(e) => command(e)}
-        onMouseDown={(e) => {
-          command(e);
-        }}
-      >
-        Code Block
-      </button>
-    </div>
+      <CardContent className="px-3 grid gap-2">
+        <Button
+          onKeyDown={(e) => command(e)}
+          onMouseDown={(e) => {
+            command(e);
+          }}
+        >
+          <CodeRoundedIcon />
+          代码块
+        </Button>
+        <Button
+          onKeyDown={(e) => command(e)}
+          onMouseDown={(e) => {
+            command(e);
+          }}
+        >
+          <CodeRoundedIcon />
+          代码块
+        </Button>
+      </CardContent>
+    </Card>
   );
-}
-export default SlashView;
+};

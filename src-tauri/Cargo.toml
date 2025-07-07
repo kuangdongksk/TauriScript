@@ -1,6 +1,6 @@
 [package]
 name = "script"
-version = "0.1.11"
+version = "0.1.12"
 description = "小工具"
 authors = ["kd"]
 edition = "2024"
@@ -15,7 +15,7 @@ name = "script_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri = { version = "2.0.0", features = [ "tray-icon" ] }
+tauri = { version = "2.0.0", features = [ "tray-icon", "devtools" ] }
 tauri-build = { version = "2.2.0", features = [] }
 
 [dependencies]

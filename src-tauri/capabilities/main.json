@@ -4,7 +4,7 @@
   "windows": ["main"],
   "webview": ["main"],
   "remote": {
-    "urls": ["http://localhost:1420/"]
+    "urls": ["http://localhost:1500/"]
   },
   "local": true,
   "permissions": [

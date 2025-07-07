@@ -28,9 +28,9 @@ function Home() {
               />
               <Breadcrumb>
                 <BreadcrumbList>
-                  {location.pathname.split("/").map((path) => {
+                  {location.pathname.split("/").map((path, i) => {
                     return (
-                      <BreadcrumbItem key={path} className=" md:block">
+                      <BreadcrumbItem key={path + i} className=" md:block">
                         <BreadcrumbLink>{path}</BreadcrumbLink>
                       </BreadcrumbItem>
                     );

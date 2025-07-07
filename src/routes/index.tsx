@@ -9,6 +9,7 @@ import VditorNote from "../pages/Note/Vditor";
 import BreakOverlay from "../pages/Pomodoro/BreakOverlay";
 import Pomodoro from "../pages/Pomodoro/Pomodoro";
 import Setting from "../pages/Setting/Setting";
+import { GamePage } from "../pages/game/战棋/GamePage";
 
 export interface RouteConfig {
   path: string;
@@ -47,6 +48,15 @@ const router = createBrowserRouter([
       {
         path: "/pomodoro",
         element: <Pomodoro />,
+      },
+      {
+        path: "/game",
+        children: [
+          {
+            path: "/game/battlegrounds",
+            element: <GamePage />,
+          },
+        ],
       },
       {
         path: "/setting",

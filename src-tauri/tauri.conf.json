@@ -8,7 +8,7 @@
     "beforeDevCommand": "pnpm run web:dev",
 
     "frontendDist": "../dist",
-    "devUrl": "http://localhost:1420/"
+    "devUrl": "http://localhost:1500/"
   },
   "app": {
     "security": {
