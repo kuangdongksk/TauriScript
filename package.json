@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.11.1",
   "scripts": {
     "dev": "cross-env RUST_BACKTRACE=1 tauri dev -f verge-dev",
-    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tauri build",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' tauri build --debug",
     "preview": "vite preview",
     "tauri": "tauri",
     "web:dev": "vite  --mode development",
@@ -68,7 +68,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@remotion/cli": "4.0.320",
-    "@remotion/eslint-plugin": "^4.0.321",
+    "@remotion/eslint-plugin": "^4.0.322",
     "@tailwindcss/vite": "^4.1.11",
     "@tauri-apps/api": "^2.6.0",
     "@tauri-apps/plugin-autostart": "~2.4.0",
@@ -112,7 +112,7 @@
     "y-protocols": "^1.0.6",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.27",
-    "zod": "^3.25.74"
+    "zod": "^3.25.75"
   },
   "devDependencies": {
     "@actions/github": "^6.0.1",
