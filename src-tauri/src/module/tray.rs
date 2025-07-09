@@ -2,7 +2,6 @@ use tauri::{
   menu::{ Menu, MenuEvent, MenuItem },
   tray::{ TrayIcon, TrayIconBuilder, TrayIconEvent },
   Manager,
-  image::{ Image },
 };
 
 pub fn create_tray(
