@@ -7,7 +7,7 @@ import envConfig from '../utils/envConfig';
  * 这个实例使用config.ts中定义的API_BASE_URL作为baseURL
  * 所有API请求都应该使用这个实例，而不是直接使用axios
  */
-const api = axios.create({
+const Requestor = axios.create({
   baseURL: envConfig.apiBaseUrl,
   timeout: 10000, // 10秒超时
   headers: {
@@ -18,7 +18,7 @@ const api = axios.create({
 
 
 // 请求拦截器
-api.interceptors.request.use(
+Requestor.interceptors.request.use(
   (config) => {
     // 可以在这里添加认证令牌等
     const token = localStorage.getItem('token');
@@ -33,7 +33,7 @@ api.interceptors.request.use(
 );
 
 // 响应拦截器
-api.interceptors.response.use(
+Requestor.interceptors.response.use(
   (response) => {
     if (response.data.code === 200) { return response; }
     return Promise.reject(new Error(response.data.msg));
@@ -63,4 +63,4 @@ api.interceptors.response.use(
 );
 
 
-export default api;
+export default Requestor;

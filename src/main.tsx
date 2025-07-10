@@ -6,7 +6,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "./pages/Setting/components/theme";
 import router from "./routes";
-import api from "./services/api";
+import api from "./services/Requestor";
 import { serviceOptions } from "./services/index.defs";
 import { Toaster } from "./components/ui/sonner";
 
